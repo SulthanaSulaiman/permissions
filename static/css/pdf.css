@@ -1,0 +1,31 @@
+  
+  .logo {
+    font-family: 'Peralta', cursive;
+  }
+  
+  .logo a {
+    color: rgba(0,0,0,.9);
+  }
+  
+  .logo a:hover,
+  .logo a:active {
+    text-decoration: none;
+  }
+body {
+  text-align: justify;
+}
+@page {
+  size: a4 portrait;
+  margin: 80mm 20mm 20mm 20mm;
+  @top-left{
+    content: url(../img/JBL_Logo_resized1.png);
+  };
+  @bottom-right{
+    content: "An Ascend Learning Company";
+  }
+}
+
+.responsive {
+  width: 100%;
+  height: auto;
+}

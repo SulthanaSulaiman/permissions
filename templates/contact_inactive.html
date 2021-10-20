@@ -1,0 +1,39 @@
+{% extends 'base.html' %}{% load static %}
+{% load humanize %}
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'contacts'%}">Contacts</a></li>
+  <li class="breadcrumb-item" active>Inactive Contacts</li>
+{% endblock %}
+
+{% block content %}
+
+        {%if contacts.count == 0 %}
+             <p>No inactive contacts on the portal yet!</p>
+        {% else %}
+        <table class="table table-striped mb-4">
+        <thead class="thead-inverse">
+        <tr>
+        <th>FIRST NAME</th>
+        <th>LAST NAME</th>
+        <th>EMAIL ID</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for contact in contacts %}
+            <tr>
+                <td class="align-middle">
+                    {{contact.rh_firstname}}
+                </td>
+                <td class="align-middle">{{contact.rh_lastname}}</td>
+                <td class="align-middle">{{contact.rh_email}}</td>
+                <td class="align-middle"><a href="{% url 'activate_contact' contact.pk %}" class="btn btn-danger btn-sm" role="button">ACTIVATE</a></td>
+            </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+ 
+
+{% include 'includes/pagination.html' %}
+
+{% endblock %}

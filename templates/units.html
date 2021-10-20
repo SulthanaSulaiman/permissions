@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ book.title }} - {{block.super}}
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item active">{{ book.title }}</li>
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+    <a href="{% url 'new_unit' book.pk %}" class="btn btn-primary btn-sm">NEW UNIT</a>
+    <a href="{% url 'process_data' book.pk %}" class="btn btn-primary btn-sm">IMPORT DATA</a>
+    <a href="{% url 'process_images' book.pk %}" class="btn btn-primary btn-sm">PROCESS IMAGES</a>
+    <a href="{% url 'unit_list' book.pk %}" class="btn btn-primary btn-sm">PERMISSION</a>
+    <!-- <a href="{% url 'import_units' book.pk%}" class="btn btn-primary btn-sm">IMPORT UNITS</a>
+    <a href="{% url 'export_units' book.pk %}" class="btn btn-primary btn-sm">EXPORT UNIT DETAILS</a> -->
+</div>
+
+<table class="table table-striped mb-4">
+  <thead class="thead-inverse">
+    <tr>
+      <th>CHAPTER NUMBER</th>
+      {% comment %} <th>CHAPTER TITLE</th> {% endcomment %}
+      <th>ELEMENTS</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for unit in units %}
+      <tr>
+        <td class="align-middle"><a href="{% url 'unit_elements' book.pk unit.pk%}">{{ unit.chapter_number }}</a></td>
+        {% comment %} <td class="align-middle">{{ unit.chapter_title }}</td> {% endcomment %}
+        <td class="align-middle">{{ unit.get_element_count }}</td>
+        <td class="align-middle"><a href="{% url 'edit_unit' unit.book.pk unit.pk%}" class="btn btn-secondary btn-sm" role="button">UPDATE</a></td>
+        {%if group == 'admin'%}<td class="align-middle"><a href="{% url 'delete_unit' unit.book.pk unit.pk%}" class="btn btn-danger btn-sm" role="button">DELETE</a></td>{% endif %}
+      </tr>
+    {% endfor %}  
+  </tbody>
+</table>
+{% include 'includes/pagination.html' %}
+{% endblock %}
