@@ -142,6 +142,7 @@ class Element(models.Model):
     credit_line = models.TextField(max_length=300, null=True, blank=True)
     # status = models.CharField(max_length=25, choices=STATUS_CHOICES, blank=True)
     source_link = models.CharField(max_length=300, null=True, blank=True)
+    rh_email = models.CharField(max_length=300, null=True, blank=True)
     title = models.CharField(max_length=200, null=True, blank=True)
     # rh_email = models.CharField(max_length=200, null=True)
     # alt_email = models.EmailField(null=True, blank=True)

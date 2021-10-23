@@ -31,9 +31,9 @@ def import_data(isbn, data):
     for i,y in enumerate(data['RH Contact']):
         if pd.isnull(y)==True:
             return("One of the contacts is empty!")
-        contact = Contact.objects.filter(rh_email = data['RH Contact'][i]).first()
-        if contact==None:
-            return("Contact {} does not exist in the contact's database.".format(data['RH Contact'][i]))
+        #contact = Contact.objects.filter(rh_email = data['RH Contact'][i]).first()
+        #if contact==None:
+        #    return("Contact {} does not exist in the contact's database.".format(data['RH Contact'][i]))
     
     
     for u in set(data['Chapter Number']):
@@ -68,8 +68,9 @@ def import_data(isbn, data):
                 element.credit_line = data['Credit Line'][i] if 'Credit Line' in data else ''
                 element.source_link = data['Source Link'][i] if 'Source Link' in data else ''
                 element.title = data['Title with author'][i] if 'Title with author' in data else ''
-                contact = Contact.objects.filter(rh_email = data['RH Contact'][i]).first()
-                element.contact_id = contact.pk
+                element.rh_email = data['RH Contact'][i] if 'RH Contact' in data else ''
+                #contact = Contact.objects.filter(rh_email = data['RH Contact'][i]).first()
+                #element.contact_id = contact.pk
                 # element.rh_email = data['RH e-mail'][i]
                 # element.alt_email = data['Alt - e-mail'][i]
                 # element.rh_address = data['RH Address'][i]
@@ -96,8 +97,9 @@ def import_data(isbn, data):
                     element.credit_line = data['Credit Line'][i] if 'Credit Line' in data else ''
                     element.source_link = data['Source Link'][i] if 'Source Link' in data else ''
                     element.title = data['Title with author'][i] if 'Title with author' in data else ''
-                    contact = Contact.objects.filter(rh_email = data['RH Contact'][i]).first()
-                    element.contact_id = contact.pk
+                    element.rh_email = data['RH Contact'][i] if 'RH Contact' in data else ''
+                    #contact = Contact.objects.filter(rh_email = data['RH Contact'][i]).first()
+                    #element.contact_id = contact.pk
                     # element.rh_email = data['RH e-mail'][i]
                     # element.alt_email = data['Alt - e-mail'][i]
                     # element.rh_address = data['RH Address'][i]

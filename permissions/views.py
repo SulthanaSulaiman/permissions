@@ -629,8 +629,8 @@ def unit_list(request, pk):
             source=p.source.strip()
         if not p.credit_line is None:
             credit_line=p.credit_line.strip()
-        if not p.contact.rh_email is None:
-            rh_email=p.contact.rh_email.strip()
+        if not p.rh_email is None:
+            rh_email=p.rh_email.strip()
         s=source,credit_line,rh_email
         context[s].append(p.pk)
     context.default_factory = None
@@ -663,7 +663,7 @@ def email_agreement(request, pk, ems):
     for ems in ems_list:
         for e in element:
             if ems==e.pk:
-                email_rh = e.contact.rh_email
+                email_rh = e.rh_email
                 source = e.source
                 imag_calc_name=e.imag_calc_name
                 rs_name=e.jbl_rh_name
@@ -807,8 +807,8 @@ def requested_list(request, pk):
             source=p.source.strip()
         if not p.credit_line is None:
             credit_line=p.credit_line.strip()
-        if not p.contact.rh_email is None:
-            rh_email=p.contact.rh_email.strip()
+        if not p.rh_email is None:
+            rh_email=p.rh_email.strip()
         s=source,credit_line,rh_email
         context[s].append(p.pk)
     context.default_factory = None
@@ -828,8 +828,8 @@ def granted_list(request, pk):
             source=p.source.strip()
         if not p.credit_line is None:
             credit_line=p.credit_line.strip()
-        if not p.contact.rh_email is None:
-            rh_email=p.contact.rh_email.strip()
+        if not p.rh_email is None:
+            rh_email=p.rh_email.strip()
         s=source,credit_line,rh_email
         context[s].append(p.pk)
     context.default_factory = None
@@ -941,7 +941,7 @@ def followup_email_agreement(request, pk, ems):
         for e in element:
             if ems==e.pk:
                 dates[e.element_number].append(e.follow_up.all().order_by('followedup_at'))
-                email_rh = e.contact.rh_email
+                email_rh = e.rh_email
                 source = e.source
                 imag_calc_name=e.imag_calc_name
                 jbl_rh_name = e.jbl_rh_name
@@ -1060,7 +1060,7 @@ def followup_email_agreement_e(request, pk, pk1, pk2):
     #    return redirect('unit_list', pk=book.pk)
     source1= source.replace(" ", "_")
     
-    email_rh = element.contact.rh_email
+    email_rh = element.rh_email
     e_list = email_rh.split (",")
     subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name, source)
     user_data = User.objects.get(username=request.user.username)
@@ -1178,8 +1178,8 @@ def denied_list(request, pk):
             source=p.source.strip()
         if not p.credit_line is None:
             credit_line=p.credit_line.strip()
-        if not p.contact.rh_email is None:
-            rh_email=p.contact.rh_email.strip()
+        if not p.rh_email is None:
+            rh_email=p.rh_email.strip()
         s=source,credit_line,rh_email
         context[s].append(p.pk)
     context.default_factory = None
