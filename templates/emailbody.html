@@ -38,9 +38,10 @@ I have attached a copy of the permission request for you, which contains more in
         {% if ems == e.pk %}
                 <li>
                     <p><b>JBL ID:</b> {{e.file_name}}<br/>
-                    <b>Description:</b> {{e.caption}}<br/>
+                    <b>Caption:</b> {{e.caption}}<br/>
+                    <b>Description:</b> {{e.description}}<br/>
                     <b>Credit Line:</b> {{e.credit_line}}<br/>
-                    {% if e.source != '' %}<b>Source:</b> {{e.source}}{% endif %}</p>
+                    {% if e.source_link != '' %}<b>Source:</b> {{e.source_link}}{% endif %}</p>
                 </li>
         {% endif %}
     {% endfor %}    
@@ -53,12 +54,10 @@ I have attached a copy of the permission request for you, which contains more in
 <p>Your prompt response would be greatly appreciated!</p>
 <p>Thanks in advance for your help.</p>
 <p>Regards,<br/>
-{{user.first_name}} {{user.last_name}},<br/>
-Sr. Executive ‐ Text & Permissions,<br/>
-Rights and Media Services,<br/>
-S4Carlisle Publishing Services Pvt. Ltd.</p>
+{{rs_name}}.<br/>
+
 {% load templates %} 
-{% current_time "%m %d %y" %}
+
 
 
 </body>

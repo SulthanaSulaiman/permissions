@@ -15,10 +15,7 @@
 <p>Looking forward to hear from you!</p>
 
 <p>Regards,<br/>
-{{user.first_name}} {{user.last_name}},<br/>
-Sr. Executive ‐ Text & Permissions,<br/>
-Rights and Media Services,<br/>
-S4Carlisle Publishing Services Pvt. Ltd.</p>
+{{element.jbl_rh_name}}.<br/>
 <p>-----Original Request--------</p>
 
  <p>I am {{user.first_name}}, Permission Specialist writing on behalf of my client Jones & Bartlett Learning, a textbook publishing company. </p>
@@ -53,17 +50,15 @@ S4Carlisle Publishing Services Pvt. Ltd.</p>
 <p>{{element.caption}}</p>
 I have attached a copy of the permission request for you, which contains more information of our publication and the rights that we are requesting.</p>
                     <p><b>JBL ID:</b> {{element.file_name}}<br/>
-                    <b>Description:</b> {{element.caption}}<br/>
+                    <b>Caption:</b> {{element.caption}}<br/>
+                    <b>Description:</b> {{element.description}}<br/>
                     <b>Credit Line:</b> {{element.credit_line}}<br/>
-                    {% if element.source != '' %}<b>Source:</b> {{element.source}}{% endif %}</p>
+                    {% if element.source != '' %}<b>Source:</b> {{element.source_link}}{% endif %}</p>
 <p>I have attached image(s) for your reference. <b>Could you please sign and return a copy of the attached permission letter to my attention via E‐mail along with Hi resolution image(s)?</b> You can find the requested content at the end of the permission letter. Please let know if you have any questions or concerns about the rights that we are requesting.</p>
 <p>Your prompt response would be greatly appreciated!</p>
 <p>Thanks in advance for your help.</p>
 <p>Regards,<br/>
-{{user.first_name}} {{user.last_name}},<br/>
-Sr. Executive ‐ Text & Permissions,<br/>
-Rights and Media Services,<br/>
-S4Carlisle Publishing Services Pvt. Ltd.</p>
+{{element.jbl_rh_name}}.<br/>
 
 </body>
 {% endblock %}

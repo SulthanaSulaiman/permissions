@@ -657,33 +657,42 @@ def email_agreement(request, pk, ems):
     media_path = settings.MEDIA_ROOT
 
     ems_list = json.loads(ems)    
-    
-    jbl_rh_name = ''
+    imag_calc_name=''
+    source=''
+    #jbl_rh_name = ''
     for ems in ems_list:
         for e in element:
             if ems==e.pk:
                 email_rh = e.contact.rh_email
-                jbl_rh_name = e.jbl_rh_name
+                source = e.source
+                imag_calc_name=e.imag_calc_name
+                rs_name=e.jbl_rh_name
+                #jbl_rh_name = e.jbl_rh_name
 
-    if jbl_rh_name=='':
-        return redirect('unit_list', pk=book.pk)
-    subject = "Jones & Bartlett Permission Request_{}_{}".format(book.isbn, jbl_rh_name)
-    rh_name = jbl_rh_name.replace(" ", "_")
+    #if jbl_rh_name=='':
+    #    return redirect('unit_list', pk=book.pk)
+    #subject = "Jones & Bartlett Permission Request_{}_{}".format(book.isbn, jbl_rh_name)
+    #rh_name = jbl_rh_name.replace(" ", "_")
+    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
 
+    source1 = source.replace(" ", "_")
     e_list = email_rh.split (",")
-    rh_name.replace(" ", "_")
+    #rh_name.replace(" ", "_")
     user_data = User.objects.get(username=request.user.username)
-    message = render_to_string("emailbody.html", {'ems_list': ems_list, 'element': element, 'user': user_data})
-   
+
+    #message = render_to_string("emailbody.html", {'ems_list': ems_list, 'element': element, 'user': user_data})
+    message = render_to_string("emailbody.html", {'ems_list': ems_list, 'element': element, 'user': user_data,'rs_name':rs_name})
+
     #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', e_list)
     #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', e_list,reply_to=[request.user.email]
     email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', e_list,reply_to=[request.user.email],cc=['s4permission@gmail.com'])
+
     html = render_to_string("generate_agreement.html", {'ems_list': ems_list, 'element': element})
     out = BytesIO()
     stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(out, stylesheets=stylesheets)
     response = HttpResponse(content_type="application/pdf")
-    email.attach("Jones_and_Bartlett_Learning_{}_{}.pdf".format(book.isbn, rh_name), out.getvalue(), 'application/pdf')
+    email.attach("Jones_and_Bartlett_Learning_{}_{}.pdf".format(imag_calc_name, source1), out.getvalue(), 'application/pdf')
     email.content_subtype = "html"
     # email.send()
 
@@ -720,32 +729,35 @@ def test_email_agreement(request, pk, ems):
     ems_list = json.loads(ems)    
     
     media_path = settings.MEDIA_ROOT
-
-    jbl_rh_name = ''
+    imag_calc_name=''
+    source=''
     ems_element_type = []
     for ems in ems_list:
         for e in element:
             if ems==e.pk:
-                jbl_rh_name = e.jbl_rh_name
+                source = e.source
+                imag_calc_name=e.imag_calc_name
+                rs_name=e.jbl_rh_name
+
                 ems_element_type.append(e.element_type)
-    if jbl_rh_name=='':
-        return redirect('unit_list', pk=book.pk)
+    #if source=='':
+    #    return redirect('unit_list', pk=book.pk)
 
-    subject = "Jones & Bartlett Permission Request_{}_{}".format(book.isbn, jbl_rh_name)
+    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
 
-    rh_name = jbl_rh_name.replace(" ", "_")
+    source1 = source.replace(" ", "_")
     user_data = User.objects.get(username=request.user.username)
-    message = render_to_string("emailbody.html", {'ems_list': ems_list, 'element': element, 'user': user_data})
+    message = render_to_string("emailbody.html", {'ems_list': ems_list, 'element': element, 'user': user_data,'rs_name':rs_name})
 
-    #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', [request.user.email])
-    email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', [request.user.email],reply_to=[request.user.email])
+    email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', [request.user.email])
+    #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', [request.user.email],reply_to=[request.user.email])
     
     html = render_to_string("generate_agreement.html", {'ems_list': ems_list, 'element': element})
     out = BytesIO()
     stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(out, stylesheets=stylesheets)
     response = HttpResponse(content_type="application/pdf")
-    email.attach("Jones_and_Bartlett_Learning_{}_{}.pdf".format(book.isbn, rh_name), out.getvalue(), 'application/pdf')
+    email.attach("Jones_and_Bartlett_Learning_{}_{}.pdf".format(imag_calc_name, source1), out.getvalue(), 'application/pdf')
     email.content_subtype = "html"
     # email.send()
 
@@ -777,9 +789,9 @@ def email_body(request, pk, ems):
     for ems in ems_list:
         for e in element:
             if ems==e.pk:
-                jbl_rh_name = e.jbl_rh_name
+                rs_name = e.jbl_rh_name
                 ems_element_type.append(e.element_type)
-    return render(request, 'emailbody.html', {'ems_list': ems_list, 'element': element, 'user': user_data, 'ems_element_type': ems_element_type})
+    return render(request, 'emailbody.html', {'ems_list': ems_list, 'element': element, 'user': user_data, 'ems_element_type': ems_element_type,'rs_name':rs_name})
 
 def requested_list(request, pk):
     book = get_object_or_404(Book, pk=pk)
@@ -899,11 +911,12 @@ def followup_email_body(request, pk, ems):
     for ems in ems_list:
         for e in element:
             if ems==e.pk:
+                rs_name = e.jbl_rh_name
                 dates[e.element_number].append(e.follow_up.all().order_by('followedup_at'))
                 #dates=e.follow_up.all()
     dates.default_factory = None
     user_data = User.objects.get(username=request.user.username)                
-    return render(request, 'emailbody_followup.html', {'ems_list': ems_list, 'element': element, 'user': user_data, 'dates': dates})
+    return render(request, 'emailbody_followup.html', {'ems_list': ems_list, 'element': element, 'user': user_data, 'dates': dates,'rs_name':rs_name})
 
 def followup_email_body_e(request, pk, pk1, pk2):
     book = get_object_or_404(Book, pk=pk)
@@ -921,24 +934,28 @@ def followup_email_agreement(request, pk, ems):
     dates = defaultdict(list)
     dict(dates)
     ems_list = json.loads(ems)
-    jbl_rh_name = ''   
+    jbl_rh_name = ''
+    source=''
+    imag_calc_name=''   
     for ems in ems_list:
         for e in element:
             if ems==e.pk:
                 dates[e.element_number].append(e.follow_up.all().order_by('followedup_at'))
                 email_rh = e.contact.rh_email
+                source = e.source
+                imag_calc_name=e.imag_calc_name
                 jbl_rh_name = e.jbl_rh_name
-    if jbl_rh_name=='':
-        return redirect('unit_list', pk=book.pk)
+    #if jbl_rh_name=='':
+    #    return redirect('unit_list', pk=book.pk)
 
-    rh_name = jbl_rh_name.replace(" ", "_")
+    source1 = source.replace(" ", "_")
                 #dates=e.follow_up.all()
 
     e_list = email_rh.split (",")            
     dates.default_factory = None
     user_data = User.objects.get(username=request.user.username)  
-    subject = "Jones & Bartlett Permission Request_{}_{}".format(book.isbn, jbl_rh_name)
-    message = render_to_string("emailbody_followup.html", {'ems_list': ems_list, 'element': element, 'user': user_data, 'dates': dates})
+    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name, source)
+    message = render_to_string("emailbody_followup.html", {'ems_list': ems_list, 'element': element, 'user': user_data, 'dates': dates,'rs_name':jbl_rh_name})
 
     email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', e_list)
     #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', e_list,reply_to=[request.user.email],cc=['s4permission@gmail.com'])
@@ -947,7 +964,7 @@ def followup_email_agreement(request, pk, ems):
     stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(out, stylesheets=stylesheets)
     response = HttpResponse(content_type="application/pdf")
-    email.attach("Jones_and_Bartlett_Learning_{}_{}.pdf".format(book.isbn,rh_name), out.getvalue(), 'application/pdf')
+    email.attach("Jones_and_Bartlett_Learning_{}_{}.pdf".format(imag_calc_name, source1), out.getvalue(), 'application/pdf')
     email.content_subtype = "html"
     # email.send()
     
@@ -985,23 +1002,29 @@ def test_followup_email_agreement(request, pk, ems):
     media_path = settings.MEDIA_ROOT
 
     user_data = User.objects.get(username=request.user.username)
-    message = render_to_string("emailbody_followup.html", {'ems_list': ems_list, 'element': element, 'user': user_data})
     
-    email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', [request.user.email])
-   
+    source=''
+    imag_calc_name=''
     for ems in ems_list:
         for e in element:
             if ems==e.pk:
+                source = e.source
+                imag_calc_name=e.imag_calc_name
                 jbl_rh_name = e.jbl_rh_name
-    rh_name = jbl_rh_name.replace(" ", "_")
+    source1= source.replace(" ", "_")
+
+    message = render_to_string("emailbody_followup.html", {'ems_list': ems_list, 'element': element, 'user': user_data,'rs_name':jbl_rh_name})
+    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name, source)
+    email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', [request.user.email])
+
     
-    subject = "Jones & Bartlett Permission Request_{}_{}".format(book.isbn, jbl_rh_name)
+    
     html = render_to_string("generate_followup_agreement.html", {'ems_list': ems_list, 'element': element})
     out = BytesIO()
     stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(out, stylesheets=stylesheets)
     response = HttpResponse(content_type="application/pdf")
-    email.attach("Jones_and_Bartlett_Learning_{}_{}.pdf".format(book.isbn, rh_name), out.getvalue(), 'application/pdf')
+    email.attach("Jones_and_Bartlett_Learning_{}_{}.pdf".format(imag_calc_name, source1), out.getvalue(), 'application/pdf')
     email.content_subtype = "html"
     # email.send()
 
@@ -1030,15 +1053,16 @@ def followup_email_agreement_e(request, pk, pk1, pk2):
     user = User.objects.get(username=request.user.username)
     
     media_path = settings.MEDIA_ROOT
-    
+    source=element.source
+    imag_calc_name=element.imag_calc_name
     jbl_rh_name = element.jbl_rh_name
-    if jbl_rh_name=='':
-        return redirect('unit_list', pk=book.pk)
-    rh_name = jbl_rh_name.replace(" ", "_")
+    #if jbl_rh_name=='':
+    #    return redirect('unit_list', pk=book.pk)
+    source1= source.replace(" ", "_")
     
     email_rh = element.contact.rh_email
     e_list = email_rh.split (",")
-    subject = "Jones & Bartlett Permission Request_{}_{}".format(book.isbn, jbl_rh_name)
+    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name, source)
     user_data = User.objects.get(username=request.user.username)
     message = render_to_string("emailbody_followup_e.html", {'element': element, 'user': user_data})
 
@@ -1050,7 +1074,7 @@ def followup_email_agreement_e(request, pk, pk1, pk2):
     stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(out, stylesheets=stylesheets)
     response = HttpResponse(content_type="application/pdf")
-    email.attach("Jones_and_Bartlett_Learning_{}_{}.pdf".format(book.isbn, rh_name), out.getvalue(), 'application/pdf')
+    email.attach("Jones_and_Bartlett_Learning_{}_{}.pdf".format(imag_calc_name, source1), out.getvalue(), 'application/pdf')
     email.content_subtype = "html"
     # email.send()
 

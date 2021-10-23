@@ -60,7 +60,9 @@ def import_data(isbn, data):
                 element = Element()
                 element.unit_id = unit.pk
                 element.element_number = data['Element Number'][i]
+                element.imag_calc_name = data['Imag_calc_name'][i] if 'Imag_calc_name' in data else ''
                 element.caption = data['Caption'][i] if 'Caption' in data else ''
+                element.description = data['Description'][i] if 'Description' in data else ''
                 element.source = data['Source'][i] if 'Source' in data else ''
                 element.element_type = data['Type'][i]
                 element.credit_line = data['Credit Line'][i] if 'Credit Line' in data else ''
@@ -74,7 +76,8 @@ def import_data(isbn, data):
                 # element.phone = data['Phone'][i]
                 # element.fax = data['Fax'][i]
                 element.insert_1 = data['Insert 1'][i] if 'Insert 1' in data else ''
-                element.jbl_rh_name = data['JBL RH Name'][i] if 'JBL RH Name' in data else ''
+                #element.rs_name = data['RS Name'][i] if 'RS Name' in data else ''
+                element.jbl_rh_name = data['RS Name'][i] if 'RS Name' in data else ''
                 element.file_location = data['File Location'][i]  if 'File Location' in data else ''
                 element.file_name = data['File name'][i] if 'File name' in data else ''
                 element.active = True
@@ -85,7 +88,9 @@ def import_data(isbn, data):
                 for element in elements:
                     element.unit_id = unit.pk
                     element.element_number = data['Element Number'][i]
+                    element.imag_calc_name = data['Imag_calc_name'][i] if 'Imag_calc_name' in data else ''
                     element.caption = data['Caption'][i] if 'Caption' in data else ''
+                    element.description = data['Description'][i] if 'Description' in data else ''
                     element.source = data['Source'][i] if 'Source' in data else ''
                     element.element_type = data['Type'][i]
                     element.credit_line = data['Credit Line'][i] if 'Credit Line' in data else ''
@@ -99,7 +104,8 @@ def import_data(isbn, data):
                     # element.phone = data['Phone'][i]
                     # element.fax = data['Fax'][i]
                     element.insert_1 = data['Insert 1'][i] if 'Insert 1' in data else ''
-                    element.jbl_rh_name = data['JBL RH Name'][i] if 'JBL RH Name' in data else ''
+                    #element.rs_name = data['RS Name'][i] if 'RS Name' in data else ''
+                    element.jbl_rh_name = data['RS Name'][i] if 'RS Name' in data else ''
                     element.file_location = data['File Location'][i]  if 'File Location' in data else ''
                     element.file_name = data['File name'][i] if 'File name' in data else ''
                     element.active = True
