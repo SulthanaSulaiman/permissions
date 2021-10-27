@@ -3,12 +3,13 @@ from .models import Book, Unit, Contact, Element, FollowUp
 from .widgets import BootstrapDateTimePickerInput
 from django.db import models
 from django.conf import settings
-
+class PasswordForm(forms.Form):
+    your_name = forms.CharField(label='password', max_length=100)
 class NewBookForm(forms.ModelForm):
 
     class Meta:
         model = Book
-        #fields = '__all__'
+         #fields = '__all__'
         fields = ['publisher', 'title', 'isbn', 'edition', 'active']
 
 class NewUnitForm(forms.ModelForm):
