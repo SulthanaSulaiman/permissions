@@ -13,13 +13,20 @@
 
 {% block content %}
 {%  if internet_socket %}
-<div class="alert alert-success" role="alert">
-Test agreement successfully sent to {{user.email}}
-</div>
+  {% if status %}
+
+    <div class="alert alert-success" role="alert">
+    Test agreement successfully sent to {{user.email}}
+    </div>
+  {% else %}
+    <div class="alert alert-warning" role="alert">
+    Please check your Password!
+    </div>
+  {% endif %}
 {% else %}
-<div class="alert alert-warning" role="alert">
-Please check your Password/Internet connection!
-</div>
+  <div class="alert alert-warning" role="alert">
+  Please check your Internert Connection!
+  </div>   
 {{result}}
 {% endif %}
 {% endblock %}

@@ -13,6 +13,7 @@
 
 {% block content %}
 {%  if internet_socket %}
+{%if status%}
 {% if no_images %}
   <div class="alert alert-warning" role="alert">
 No images in the folder with ISBN.
@@ -20,6 +21,11 @@ No images in the folder with ISBN.
 {% else %}
 <div class="alert alert-success" role="alert">
 Agreement successfully sent to {{e_list}}
+</div>
+{% endif %}
+{%else%}
+<div class="alert alert-warning" role="alert">
+Email not sent. Please check your Password!
 </div>
 {% endif %}
 {% else %}

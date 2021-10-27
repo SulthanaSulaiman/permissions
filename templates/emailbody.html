@@ -13,7 +13,7 @@
 <p>Hope you are doing well!</p>
 <p>I am {{user.first_name}}, Permission Specialist writing on behalf of my client Jones & Bartlett Learning, a textbook publishing company. I am currently working on </p>
 <p>{% with element.all|first as e %}
-  <b>{{ e.title }}, ISBN {{e.unit.book.isbn}}</b>
+  <b>{{e.unit.book.title}}, ISBN {{e.unit.book.isbn}}</b>
   {% endwith %}</p>
 
 <p>We would like to obtain permission to use the attached item(s) for this edition:</p>

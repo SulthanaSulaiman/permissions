@@ -49,6 +49,7 @@ import uuid
 from email.mime.image import MIMEImage
 from email.header import Header
 import os
+from .forms import PasswordForm
 
 from pytz import UTC
 
@@ -665,7 +666,7 @@ def generate_agreement(request, pk, ems):
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(response, stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')], presentational_hints=True)
     return response
 
-def email_agreement(request, pk, ems):
+def email_agreement_old(request, pk, ems):
     element = Element.objects.filter(unit__book=pk, requested_on=None)
     book = get_object_or_404(Book, pk=pk)
     media_path = settings.MEDIA_ROOT
@@ -736,6 +737,135 @@ def email_agreement(request, pk, ems):
                 logger.info("Email agreement sent for ISBN {}, chapter {}, element {} by user {} at {}".format(book.isbn, e.unit.chapter_number, e.element_number, user, timezone.now()))
     return render(request, 'email_agreement_status.html', {'book': book, 'user': user_data, 'e_list': e_list, 'internet_socket': internet_socket})
 
+def email_agreement(request, pk, ems):
+    form = PasswordForm(request.POST)
+    password=request.POST.get('password')
+    #print(password)
+        
+    element = Element.objects.filter(unit__book=pk, requested_on=None)
+    book = get_object_or_404(Book, pk=pk)
+    ems_list = json.loads(ems)    
+    
+    media_path = settings.MEDIA_ROOT
+    imag_calc_name=''
+    source=''
+    ems_element_type = []
+    for ems in ems_list:
+        for e in element:
+            if ems==e.pk:
+                email_rh = e.rh_email
+                source = e.source
+                imag_calc_name=e.imag_calc_name
+                rs_name=e.jbl_rh_name
+                
+                ems_element_type.append(e.element_type)
+    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
+   
+    source1 = source.replace(" ", "_")
+    e_list = email_rh.split (",")
+    user_data = User.objects.get(username=request.user.username)
+
+    sender_email = request.user.email
+    receiver_email = email_rh
+    body = render_to_string("emailbody.html", {'ems_list': ems_list, 'element': element, 'user': user_data,'rs_name':rs_name})
+    #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', [request.user.email])
+    #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', [request.user.email],reply_to=[request.user.email])
+    
+    # Create a multipart message and set headers
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = receiver_email
+    message["Subject"] = subject
+    message["Bcc"] = receiver_email  # Recommended for mass emails
+
+    # Add body to email
+    part = MIMEText(body, "html")
+    message.attach(part)
+
+    #generate agreement
+
+    html = render_to_string("generate_agreement.html", {'ems_list': ems_list, 'element': element})
+    out = BytesIO()
+    
+    stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
+    weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(out, stylesheets=stylesheets)
+    
+    #attach file
+    outfile = "{}/files/agreement.pdf".format(media_path)
+    file = open(outfile, 'wb')
+    file.write(out.getvalue())
+    response = HttpResponse(content_type="application/pdf")
+ 
+    attach_file = MIMEBase('application/pdf', 'octect-stream')
+    attach_file.set_payload(open(outfile, 'rb').read())
+
+    encoders.encode_base64(attach_file)
+    fn="Jones_and_Bartlett_Learning_{}_{}.pdf".format(imag_calc_name, source1)
+    attach_file.add_header('Content-Disposition','attachment', filename=fn)
+    message.attach(attach_file)
+   
+    #attach photos
+    for ems in ems_list:
+        for e in element:
+            if ems==e.pk:
+                links="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
+                if path.exists(links):
+                    if e.element_type == "Photo":
+                        print(links)
+                        #message.attach_file(links)
+                    def add_imag():
+                        with open(links, 'rb') as f:
+                                
+                            msg_image = MIMEImage(f.read(), name=os.path.basename(links))
+                        msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
+                        return msg_image
+                    
+                message.attach(add_imag())
+
+    text = message.as_string()
+    #sending mail
+    internet_socket = True
+    try:
+        if sender_email.find("@gmail")>0:
+            status=True
+            try:
+                context = ssl.create_default_context()
+                with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+                    server.login(sender_email, password)
+                    server.sendmail(sender_email, receiver_email.split(','),text)
+                print("mail sent")
+            except Exception as e:
+                print(e)
+                status=False
+            
+        else: 
+            smtpsrv = "smtp.office365.com"
+            smtpserver = smtplib.SMTP(smtpsrv,587)
+            status=True
+            try:
+                smtpserver.starttls()
+                smtpserver.login(sender_email, password)
+                smtpserver.sendmail(sender_email, receiver_email.split(','),text)
+                smtpserver.close()
+                print("mail sent")
+            except Exception as e:
+                print(e)
+                status=False
+    except socket.error as e:
+        if e.errno == 8:
+            print('There was an error sending an email: ', e)
+        internet_socket = False
+    
+    user = request.user.username
+    
+    for ems in ems_list:
+        for e in element:
+            if ems==e.pk:
+                e.requested_on=timezone.now()
+                e.save()
+                logger.info("Email agreement sent for ISBN {}, chapter {}, element {} by user {} at {}".format(book.isbn, e.unit.chapter_number, e.element_number, user, timezone.now()))
+    return render(request, 'email_agreement_status.html', {'book': book, 'user': user_data, 'e_list': e_list, 'internet_socket': internet_socket,'status':status})
+
 
 def test_email_agreement_old(request, pk, ems):
     element = Element.objects.filter(unit__book=pk, requested_on=None)
@@ -794,21 +924,15 @@ def test_email_agreement_old(request, pk, ems):
 
     return render(request, 'test_email_agreement_status.html', {'book': book, 'user': user_data, 'internet_socket': internet_socket, 'ems_element_type': ems_element_type})
 
-
-
-from .forms import PasswordForm
 def test_email_agreement(request, pk, ems):
-    #password=''
+    
     form = PasswordForm(request.POST)
     password=request.POST.get('password')
-    print(password)
+    #print(password)
         
     sender_email = request.user.email
     receiver_email = request.user.email
-    
-    #print(password)
-    
-
+        
     element = Element.objects.filter(unit__book=pk, requested_on=None)
     book = get_object_or_404(Book, pk=pk)
     ems_list = json.loads(ems)    
@@ -823,19 +947,13 @@ def test_email_agreement(request, pk, ems):
                 source = e.source
                 imag_calc_name=e.imag_calc_name
                 rs_name=e.jbl_rh_name
-
+                
                 ems_element_type.append(e.element_type)
     subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
-    
-
-
+   
     source1 = source.replace(" ", "_")
     user_data = User.objects.get(username=request.user.username)
-    #body="hello"
-    #
     body = render_to_string("emailbody.html", {'ems_list': ems_list, 'element': element, 'user': user_data,'rs_name':rs_name})
-
-
     #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', [request.user.email])
     #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', [request.user.email],reply_to=[request.user.email])
     
@@ -891,20 +1009,46 @@ def test_email_agreement(request, pk, ems):
                 message.attach(add_imag())
 
     text = message.as_string()
-    
+    #sending mail
     internet_socket = True
     try:
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(sender_email, password)
-            server.sendmail(sender_email, receiver_email,text)
-        print("mail sent")
+        if sender_email.find("@gmail")>0:
+            status=True
+            try:
+                context = ssl.create_default_context()
+                with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+                    server.login(sender_email, password)
+                    server.sendmail(sender_email, receiver_email,text)
+                print("mail sent")
+            except Exception as e:
+                print(e)
+                status=False
+            
+        else: 
+            smtpsrv = "smtp.office365.com"
+            smtpserver = smtplib.SMTP(smtpsrv,587)
+            status=True
+            try:
+                smtpserver.starttls()
+                smtpserver.login(sender_email, password)
+                smtpserver.sendmail(sender_email, receiver_email, text)
+                smtpserver.close()
+                print("mail sent")
+            except Exception as e:
+                print(e)
+                status=False
     except socket.error as e:
         if e.errno == 8:
-           print('There was an error sending an email: ', e)
+            print('There was an error sending an email: ', e)
         internet_socket = False
-  
-    return render(request, 'test_email_agreement_status.html', {'book': book, 'user': user_data, 'internet_socket': internet_socket, 'ems_element_type': ems_element_type})
+    #try:
+    #    context = ssl.create_default_context()
+    #    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+    #        server.login(sender_email, password)
+    #        server.sendmail(sender_email, receiver_email,text)
+    #    print("mail sent")
+
+    return render(request, 'test_email_agreement_status.html', {'book': book, 'user': user_data, 'internet_socket': internet_socket,'status':status, 'ems_element_type': ems_element_type})
 
 def email_body(request, pk, ems):
     element = Element.objects.filter(unit__book=pk)
@@ -916,8 +1060,9 @@ def email_body(request, pk, ems):
         for e in element:
             if ems==e.pk:
                 rs_name = e.jbl_rh_name
+                title=e.title
                 ems_element_type.append(e.element_type)
-    return render(request, 'emailbody.html', {'ems_list': ems_list, 'element': element, 'user': user_data, 'ems_element_type': ems_element_type,'rs_name':rs_name})
+    return render(request, 'emailbody.html', {'ems_list': ems_list, 'element': element, 'user': user_data, 'ems_element_type': ems_element_type,'rs_name':rs_name,'title':title})
 
 def requested_list(request, pk):
     book = get_object_or_404(Book, pk=pk)
