@@ -1275,7 +1275,7 @@ def followup_email_agreement(request, pk, ems):
     #print(password)
         
     sender_email = request.user.email
-    receiver_email = request.user.email
+    
 
     dates = defaultdict(list)
     dict(dates)
@@ -1297,7 +1297,8 @@ def followup_email_agreement(request, pk, ems):
     source1 = source.replace(" ", "_")
                 #dates=e.follow_up.all()
 
-    e_list = email_rh.split (",")            
+    e_list = email_rh.split (",")  
+    receiver_email = email_rh          
     dates.default_factory = None
     user_data = User.objects.get(username=request.user.username)  
     subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name, source)
@@ -1311,7 +1312,7 @@ def followup_email_agreement(request, pk, ems):
     # Create a multipart message and set headers
     message = MIMEMultipart()
     message["From"] = sender_email
-    message["To"] = email_rh
+    message["To"] = receiver_email
     message["Subject"] = subject
     #message["Bcc"] = "s4permission@gmail.com"  # Recommended for mass emails
 
@@ -1402,7 +1403,7 @@ def followup_email_agreement(request, pk, ems):
                 e.follow_up.create(followedup_at=timezone.now(), followedup_by=user)
                 e.save()
                 logger.info("Followup date updated to {} for ISBN {}, chapter {}, element {} by {} at {}".format(timezone.now(), book.isbn, e.unit.chapter_number, e.element_number, user, timezone.now()))  
-    return render(request, 'followup_email_agreement_status.html', {'book': book, 'user': user_data, 'e_list': e_list, 'internet_socket': internet_socket})
+    return render(request, 'followup_email_agreement_status.html', {'book': book, 'user': user_data, 'e_list': e_list, 'internet_socket': internet_socket,'status':status})
 
 def test_followup_email_agreement_old(request, pk, ems):
     element = Element.objects.filter(unit__book=pk)
