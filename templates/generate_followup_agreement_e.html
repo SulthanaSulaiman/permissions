@@ -43,9 +43,10 @@
 
 <p><b>CONTENT BEING REQUESTED:</b></p>
                     <p><b>JBL ID:</b> {{element.file_name}}<br/>
-                    <b>Element Number:</b> {{element.element_number}}<br/>
-                    <b>Description:</b> {{element.caption}}<br/>
-                    <b>Credit:</b> {{element.credit_line}}</p>
+                    <b>Caption:</b> {{element.caption}}<br/>
+                    <b>Description:</b> {{element.description}}<br/>
+                    <b>Credit Line:</b> {{element.credit_line}}<br/>
+                    {% if element.source_link != '' %}<b>Source:</b> {{element.source_link}}{% endif %}</p>
 <p></p>
 <p>For good and valuable consideration, the receipt and sufficiency of which the parties hereby acknowledge, permission is granted to Ascend Learning for the use of the Material, in accordance with the terms of this Agreement, as requested above.</p>
 <p><b>If acting on behalf of an individual, please complete the following personal information:</b></p>

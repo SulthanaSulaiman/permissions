@@ -32,7 +32,52 @@
             <b> Chapter Number:</b> {{e.unit.chapter_number}}<br/>
             <b> Caption:</b> {{e.caption}}</td>
             <td style="width:30%"><img width="200" src="/media/documents/{{e.unit.book.isbn}}/resized/{{e.unit.book.isbn}}_CH{{e.unit.chapter_number}}_{{e.shortform}}{{e.element_number}}.png"/></td></tr>
-            <tr><td></td><td colspan="4" valign="middle"><b>{% if e.get_followup_count > 0%}First {% endif %} Permission requested: </b> {{e.requested_on|timesince}} ago  <a href="{% url 'test_followup_email_agreement_e' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-secondary btn-sm" role="button">TEST</a> <a href="{% url 'followup_email_agreement_e' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-primary btn-sm" role="button">FOLLOWUP</a> <!--<a href="{% url 'followup_agreement_e' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-primary btn-sm" role="button">FOLLOWUP AGREEMENT</a> <a href="{% url 'followup_email_body_e' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-primary btn-sm" role="button">FOLLOWUP EMAIL</a>--> <a href="{% url 'update_granted_e' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-success btn-sm" role="button">GRANTED</a> <a href="{% url 'update_status_denied' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-danger btn-sm" role="button">DENIED</a><br/>
+            <tr><td></td><td colspan="4" valign="middle"><b>{% if e.get_followup_count > 0%}First {% endif %} Permission requested: </b> {{e.requested_on|timesince}} ago 
+             <button type="button" id="myBtn4{{forloop.counter}}" class="btn btn-secondary btn-sm" data-toggle="modal"  data-target="#myModal4{{forloop.counter}}">TEST</button>
+                <div class="modal fade"  id="myModal4{{forloop.counter}}" tabindex="-1" role="dialog">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel4{{forloop.counter}}">Authentication</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <form method="post" action="{% url 'test_followup_email_agreement_e' e.unit.book.pk e.unit.pk e.pk%}">
+                          {% csrf_token %}
+                          <label for="password">Enter the Password: </label>
+                          <input id="password4{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
+                          <button type="submit"  class="btn btn-success btn-sm">Send</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <button type="button" id="myBtn5{{forloop.counter}}" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#myModal5{{forloop.counter}}">FOLLOWUP</button>
+                <div class="modal fade"  id="myModal5{{forloop.counter}}" tabindex="-1" role="dialog">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel5{{forloop.counter}}">Authentication</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <form method="post" action="{% url 'followup_email_agreement_e' e.unit.book.pk e.unit.pk e.pk%}">
+                          {% csrf_token %}
+                          <label for="password">Enter the Password: </label>
+                          <input id="password5{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
+                          <button type="submit"  class="btn btn-success btn-sm">Send</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              
+             <!--<a href="{% url 'followup_agreement_e' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-primary btn-sm" role="button">FOLLOWUP AGREEMENT</a> <a href="{% url 'followup_email_body_e' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-primary btn-sm" role="button">FOLLOWUP EMAIL</a>--> 
+            <a href="{% url 'update_granted_e' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-success btn-sm" role="button">GRANTED</a> <a href="{% url 'update_status_denied' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-danger btn-sm" role="button">DENIED</a><br/>
             <b>Number of followups:</b> {{e.get_followup_count}}{% if e.get_followup_count > 0%} ({{e.get_followup_dates|join:", "}}) {% endif %}
             {% comment %} ({% for f in e.get_followup_dates %}
               {{f|join:" // "}}
@@ -46,12 +91,12 @@
        class="btn btn-primary btn-sm"
        role="button">FOLLOWUP OLD</a> {% endcomment %}
       
-       <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#exampleModal3" data-whatever="@mdo3">TEST</button>
-          <div class="modal fade" id="exampleModal3" tabindex="-1" role="dialog" aria-labelledby="test2" aria-hidden="true">
+       <button type="button" id="myBtn2{{forloop.counter}}" class="btn btn-secondary btn-sm" data-toggle="modal"  data-target="#myModal2{{forloop.counter}}">TEST</button>
+          <div class="modal fade"  id="myModal2{{forloop.counter}}" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Authentication</h5>
+                  <h5 class="modal-title" id="exampleModalLabel2{{forloop.counter}}">Authentication</h5>
                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -60,19 +105,19 @@
                   <form method="post" action="{% url 'test_followup_email_agreement' pk ems%}">
                   {% csrf_token %}
                   <label for="password">Enter the Password: </label>
-                  <input id="password" type="password" name="password" class="breadcrumb-item">
+                  <input id="password2{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
                   <button type="submit"  class="btn btn-success btn-sm">Send</button>
                   </form>
                 </div>
               </div>
             </div>
           </div>
-        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal4" data-whatever="@mdo4">FOLLOWUP</button>
-          <div class="modal fade" id="exampleModal4" tabindex="-1" role="dialog" aria-labelledby="send2" aria-hidden="true">
+        <button type="button" id="myBtn3{{forloop.counter}}" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal3{{forloop.counter}}">FOLLOWUP</button>
+          <div class="modal fade" id="myModal3{{forloop.counter}}" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Authentication</h5>
+                  <h5 class="modal-title" id="exampleModalLabel3{{forloop.counter}}">Authentication</h5>
                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -81,7 +126,7 @@
                   <form method="post" action="{% url 'followup_email_agreement' pk ems%}">
                   {% csrf_token %}
                   <label for="password">Enter the Password: </label>
-                  <input id="password" type="password" name="password" class="breadcrumb-item">
+                  <input id="password3{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
                   <button type="submit"  class="btn btn-success btn-sm">Send</button>
                   </form>
                 </div>

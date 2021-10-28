@@ -776,7 +776,7 @@ def email_agreement(request, pk, ems):
     message["From"] = sender_email
     message["To"] = receiver_email
     message["Subject"] = subject
-    message["Bcc"] = "s4permission@gmail.com"  # Recommended for mass emails
+    #message["Bcc"] = "s4permission@gmail.com"  # Recommended for mass emails
 
     # Add body to email
     part = MIMEText(body, "html")
@@ -962,7 +962,7 @@ def test_email_agreement(request, pk, ems):
     message["From"] = sender_email
     message["To"] = receiver_email
     message["Subject"] = subject
-    message["Bcc"] = "s4permission@gmail.com"  # Recommended for mass emails
+    #message["Bcc"] = "s4permission@gmail.com"  # Recommended for mass emails
 
     # Add body to email
     part = MIMEText(body, "html")
@@ -1196,8 +1196,7 @@ def followup_email_body_e(request, pk, pk1, pk2):
     user_data = User.objects.get(username=request.user.username)
     return render(request, 'emailbody_followup_e.html', {'element': element, 'user': user_data})
 
-
-def followup_email_agreement(request, pk, ems):
+def followup_email_agreement_old(request, pk, ems):
     element = Element.objects.filter(unit__book=pk)
     book = get_object_or_404(Book, pk=pk)
     media_path = settings.MEDIA_ROOT
@@ -1256,6 +1255,145 @@ def followup_email_agreement(request, pk, ems):
             print('There was an error sending an email: ', e)
             internet_socket = False
     user = request.user.username
+
+    user = User.objects.get(username=request.user.username)
+    for ems in ems_list:
+        for e in element:
+            if ems==e.pk:
+                e.follow_up.create(followedup_at=timezone.now(), followedup_by=user)
+                e.save()
+                logger.info("Followup date updated to {} for ISBN {}, chapter {}, element {} by {} at {}".format(timezone.now(), book.isbn, e.unit.chapter_number, e.element_number, user, timezone.now()))  
+    return render(request, 'followup_email_agreement_status.html', {'book': book, 'user': user_data, 'e_list': e_list, 'internet_socket': internet_socket})
+
+def followup_email_agreement(request, pk, ems):
+    element = Element.objects.filter(unit__book=pk)
+    book = get_object_or_404(Book, pk=pk)
+    media_path = settings.MEDIA_ROOT
+
+    form = PasswordForm(request.POST)
+    password=request.POST.get('password')
+    #print(password)
+        
+    sender_email = request.user.email
+    receiver_email = request.user.email
+
+    dates = defaultdict(list)
+    dict(dates)
+    ems_list = json.loads(ems)
+    rs_name = ''
+    source=''
+    imag_calc_name=''   
+    for ems in ems_list:
+        for e in element:
+            if ems==e.pk:
+                dates[e.element_number].append(e.follow_up.all().order_by('followedup_at'))
+                email_rh = e.rh_email
+                source = e.source
+                imag_calc_name=e.imag_calc_name
+                rs_name = e.jbl_rh_name
+    #if jbl_rh_name=='':
+    #    return redirect('unit_list', pk=book.pk)
+
+    source1 = source.replace(" ", "_")
+                #dates=e.follow_up.all()
+
+    e_list = email_rh.split (",")            
+    dates.default_factory = None
+    user_data = User.objects.get(username=request.user.username)  
+    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name, source)
+    
+    body = render_to_string("emailbody_followup.html", {'ems_list': ems_list, 'element': element, 'user': user_data,'dates': dates,'rs_name':rs_name})
+    #message = render_to_string("emailbody_followup.html", {'ems_list': ems_list, 'element': element, 'user': user_data, 'dates': dates,'rs_name':jbl_rh_name})
+
+    #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', e_list)
+    #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', e_list,reply_to=[request.user.email],cc=['s4permission@gmail.com'])
+    
+    # Create a multipart message and set headers
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = email_rh
+    message["Subject"] = subject
+    #message["Bcc"] = "s4permission@gmail.com"  # Recommended for mass emails
+
+    # Add body to email
+    part = MIMEText(body, "html")
+    message.attach(part)
+
+    #generate agreement
+
+    html = render_to_string("generate_followup_agreement.html", {'ems_list': ems_list, 'element': element})
+    out = BytesIO()
+    stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
+    weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(out, stylesheets=stylesheets)
+    
+    #attach file
+    outfile = "{}/files/agreement.pdf".format(media_path)
+    file = open(outfile, 'wb')
+    file.write(out.getvalue())
+    response = HttpResponse(content_type="application/pdf")
+ 
+    attach_file = MIMEBase('application/pdf', 'octect-stream')
+    attach_file.set_payload(open(outfile, 'rb').read())
+
+    encoders.encode_base64(attach_file)
+    fn="Jones_and_Bartlett_Learning_{}_{}.pdf".format(imag_calc_name, source1)
+    attach_file.add_header('Content-Disposition','attachment', filename=fn)
+    message.attach(attach_file)
+    # email.send()
+    
+
+
+    #attach photos
+    for ems in ems_list:
+        for e in element:
+            if ems==e.pk:
+                links="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
+                if path.exists(links):
+                    if e.element_type == "Photo":
+                        print(links)
+                        #message.attach_file(links)
+                    def add_imag():
+                        with open(links, 'rb') as f:
+                                
+                            msg_image = MIMEImage(f.read(), name=os.path.basename(links))
+                        msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
+                        return msg_image
+                    
+                message.attach(add_imag())
+
+    text = message.as_string()
+    #sending mail
+    internet_socket = True
+    try:
+        if sender_email.find("@gmail")>0:
+            status=True
+            try:
+                context = ssl.create_default_context()
+                with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+                    server.login(sender_email, password)
+                    server.sendmail(sender_email, receiver_email.split(','),text)
+                print("mail sent")
+            except Exception as e:
+                print(e)
+                status=False
+            
+        else: 
+            smtpsrv = "smtp.office365.com"
+            smtpserver = smtplib.SMTP(smtpsrv,587)
+            status=True
+            try:
+                smtpserver.starttls()
+                smtpserver.login(sender_email, password)
+                smtpserver.sendmail(sender_email, receiver_email.split(','), text)
+                smtpserver.close()
+                print("mail sent")
+            except Exception as e:
+                print(e)
+                status=False
+    except socket.error as e:
+        if e.errno == 8:
+            print('There was an error sending an email: ', e)
+        internet_socket = False
 
     user = User.objects.get(username=request.user.username)
     for ems in ems_list:
@@ -1355,7 +1493,7 @@ def test_followup_email_agreement(request, pk, ems):
     message["From"] = sender_email
     message["To"] = receiver_email
     message["Subject"] = subject
-    message["Bcc"] = "s4permission@gmail.com"  # Recommended for mass emails
+    #message["Bcc"] = "s4permission@gmail.com"  # Recommended for mass emails
 
     # Add body to email
     part = MIMEText(body, "html")
@@ -1443,7 +1581,7 @@ def test_followup_email_agreement(request, pk, ems):
 
     return render(request, 'test_followup_email_agreement_status.html', {'book': book, 'user': user_data, 'internet_socket': internet_socket,'status':status})
 
-def followup_email_agreement_e(request, pk, pk1, pk2):
+def followup_email_agreement_e_old(request, pk, pk1, pk2):
     book = get_object_or_404(Book, pk=pk)
     unit = get_object_or_404(Unit, pk=pk1)
     element = get_object_or_404(Element, pk=pk2)
@@ -1494,7 +1632,120 @@ def followup_email_agreement_e(request, pk, pk1, pk2):
     logger.info("Followup date updated to {} for ISBN {}, chapter {}, element {} by {} at {}".format(timezone.now(), book.isbn, unit.chapter_number, element.element_number, user, timezone.now()))  
     return render(request, 'followup_email_agreement_status.html', {'book': book, 'user': user_data, 'e_list': e_list, 'internet_socket': internet_socket})
 
-def test_followup_email_agreement_e(request, pk, pk1, pk2):
+def followup_email_agreement_e(request, pk, pk1, pk2):
+    book = get_object_or_404(Book, pk=pk)
+    unit = get_object_or_404(Unit, pk=pk1)
+    element = get_object_or_404(Element, pk=pk2)
+    user = User.objects.get(username=request.user.username)
+    media_path = settings.MEDIA_ROOT
+
+    form = PasswordForm(request.POST)
+    password=request.POST.get('password')
+    #print(password)
+
+    email_rh = element.rh_email
+    e_list = email_rh.split (",")
+
+    sender_email = request.user.email
+    receiver_email = email_rh
+
+    imag_calc_name=element.imag_calc_name
+    source=element.source   
+    rs_name=element.jbl_rh_name
+    
+    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
+    source1 = source.replace(" ", "_")
+    user_data = User.objects.get(username=request.user.username)
+    body = render_to_string("emailbody_followup_e.html", {'element': element, 'user': user_data,'rs_name':rs_name})
+
+    # Create a multipart message and set headers
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = receiver_email
+    message["Subject"] = subject
+    #message["Bcc"] = "s4permission@gmail.com"  # Recommended for mass emails
+
+    # Add body to email
+    part = MIMEText(body, "html")
+    message.attach(part)
+
+    #generate agreement
+    html = render_to_string("generate_followup_agreement_e.html", {'element': element})
+    out = BytesIO()
+    stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
+    weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(out, stylesheets=stylesheets)
+    
+     
+    #attach file
+    outfile = "{}/files/agreement.pdf".format(media_path)
+    file = open(outfile, 'wb')
+    file.write(out.getvalue())
+    response = HttpResponse(content_type="application/pdf")
+ 
+    attach_file = MIMEBase('application/pdf', 'octect-stream')
+    attach_file.set_payload(open(outfile, 'rb').read())
+
+    encoders.encode_base64(attach_file)
+    fn="Jones_and_Bartlett_Learning_{}_{}.pdf".format(imag_calc_name, source1)
+    attach_file.add_header('Content-Disposition','attachment', filename=fn)
+    message.attach(attach_file)
+   
+
+    # email.send()  
+
+    
+    links="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, element.unit.book.isbn,element.unit.book.isbn,element.unit.chapter_number,element.shortform(),element.element_number)
+    print(links)
+    if path.exists(links):
+        if element.element_type == "Photo":
+         print(links)
+                        #message.attach_file(links)
+        def add_imag():
+            with open(links, 'rb') as f:
+                msg_image = MIMEImage(f.read(), name=os.path.basename(links))
+            msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
+            return msg_image
+                    
+        message.attach(add_imag())
+    text = message.as_string()
+
+    internet_socket = True
+    try:
+        if sender_email.find("@gmail")>0:
+            status=True
+            try:
+                context = ssl.create_default_context()
+                with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+                    server.login(sender_email, password)
+                    server.sendmail(sender_email, receiver_email.split(','),text)
+                print("mail sent")
+            except Exception as e:
+                print(e)
+                status=False
+            
+        else: 
+            smtpsrv = "smtp.office365.com"
+            smtpserver = smtplib.SMTP(smtpsrv,587)
+            status=True
+            try:
+                smtpserver.starttls()
+                smtpserver.login(sender_email, password)
+                smtpserver.sendmail(sender_email,  receiver_email.split(','), text)
+                smtpserver.close()
+                print("mail sent")
+            except Exception as e:
+                print(e)
+                status=False
+    except socket.error as e:
+        if e.errno == 8:
+            print('There was an error sending an email: ', e)
+        internet_socket = False
+
+    element.follow_up.create(followedup_at=timezone.now(), followedup_by=user)
+    element.save()
+    logger.info("Followup date updated to {} for ISBN {}, chapter {}, element {} by {} at {}".format(timezone.now(), book.isbn, unit.chapter_number, element.element_number, user, timezone.now()))  
+    return render(request, 'followup_email_agreement_status.html', {'book': book, 'user': user_data, 'e_list': e_list, 'internet_socket': internet_socket,'status':status})
+def test_followup_email_agreement_e_old(request, pk, pk1, pk2):
     book = get_object_or_404(Book, pk=pk)
     unit = get_object_or_404(Unit, pk=pk1)
     element = get_object_or_404(Element, pk=pk2)
@@ -1533,6 +1784,112 @@ def test_followup_email_agreement_e(request, pk, pk1, pk2):
             print('There was an error sending an email: ', e)
             internet_socket = False
     return render(request, 'test_followup_email_agreement_status.html', {'book': book, 'user': user_data, 'internet_socket': internet_socket})
+
+def test_followup_email_agreement_e(request, pk, pk1, pk2):
+    book = get_object_or_404(Book, pk=pk)
+    unit = get_object_or_404(Unit, pk=pk1)
+    element = get_object_or_404(Element, pk=pk2)
+    media_path = settings.MEDIA_ROOT
+
+    form = PasswordForm(request.POST)
+    password=request.POST.get('password')
+    #print(password)
+        
+    sender_email = request.user.email
+    receiver_email = request.user.email
+
+    imag_calc_name=element.imag_calc_name
+    source=element.source   
+    rs_name=element.jbl_rh_name
+    
+    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
+    source1 = source.replace(" ", "_")
+    user_data = User.objects.get(username=request.user.username)
+    body = render_to_string("emailbody_followup_e.html", {'element': element, 'user': user_data,'rs_name':rs_name})
+
+    # Create a multipart message and set headers
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = receiver_email
+    message["Subject"] = subject
+    #message["Bcc"] = "s4permission@gmail.com"  # Recommended for mass emails
+
+    # Add body to email
+    part = MIMEText(body, "html")
+    message.attach(part)
+
+    #generate agreement
+    html = render_to_string("generate_followup_agreement_e.html", {'element': element})
+    out = BytesIO()
+    stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
+    weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(out, stylesheets=stylesheets)
+    
+     
+    #attach file
+    outfile = "{}/files/agreement.pdf".format(media_path)
+    file = open(outfile, 'wb')
+    file.write(out.getvalue())
+    response = HttpResponse(content_type="application/pdf")
+ 
+    attach_file = MIMEBase('application/pdf', 'octect-stream')
+    attach_file.set_payload(open(outfile, 'rb').read())
+
+    encoders.encode_base64(attach_file)
+    fn="Jones_and_Bartlett_Learning_{}_{}.pdf".format(imag_calc_name, source1)
+    attach_file.add_header('Content-Disposition','attachment', filename=fn)
+    message.attach(attach_file)
+   
+
+    # email.send()  
+
+    
+    links="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, element.unit.book.isbn,element.unit.book.isbn,element.unit.chapter_number,element.shortform(),element.element_number)
+    print(links)
+    if path.exists(links):
+        if element.element_type == "Photo":
+         print(links)
+                        #message.attach_file(links)
+        def add_imag():
+            with open(links, 'rb') as f:
+                msg_image = MIMEImage(f.read(), name=os.path.basename(links))
+            msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
+            return msg_image
+                    
+        message.attach(add_imag())
+    text = message.as_string()
+
+    internet_socket = True
+    try:
+        if sender_email.find("@gmail")>0:
+            status=True
+            try:
+                context = ssl.create_default_context()
+                with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+                    server.login(sender_email, password)
+                    server.sendmail(sender_email, receiver_email,text)
+                print("mail sent")
+            except Exception as e:
+                print(e)
+                status=False
+            
+        else: 
+            smtpsrv = "smtp.office365.com"
+            smtpserver = smtplib.SMTP(smtpsrv,587)
+            status=True
+            try:
+                smtpserver.starttls()
+                smtpserver.login(sender_email, password)
+                smtpserver.sendmail(sender_email, receiver_email, text)
+                smtpserver.close()
+                print("mail sent")
+            except Exception as e:
+                print(e)
+                status=False
+    except socket.error as e:
+        if e.errno == 8:
+            print('There was an error sending an email: ', e)
+        internet_socket = False
+    return render(request, 'test_followup_email_agreement_status.html', {'book': book, 'user': user_data, 'internet_socket': internet_socket,'status':status})
 
 def update_status_denied(request, pk, pk1, pk2):
     book = get_object_or_404(Book, pk=pk)

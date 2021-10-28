@@ -52,12 +52,12 @@
        class="btn btn-primary btn-sm"
        role="button">PREVIEW</a>
    
-      <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">TEST</button>
-        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="test" aria-hidden="true">
+      <button type="button" id="myBtn{{forloop.counter}}" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#myModal{{forloop.counter}}">TEST</button>
+        <div class="modal fade" id="myModal{{forloop.counter}}" tabindex="-1" role="dialog" >
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Authentication</h5>
+                <h5 class="modal-title" id="exampleModalLabel{{forloop.counter}}">Authentication</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                   </button>
@@ -66,7 +66,7 @@
                 <form method="post" action="{% url 'test_email_agreement' pk ems%}">
                 {% csrf_token %}
                 <label for="password">Enter the Password: </label>
-                <input id="password" type="password" name="password" class="breadcrumb-item">
+                <input id="password{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
                 <button type="submit"  class="btn btn-success btn-sm">Send</button>
 
                 </form>
@@ -76,12 +76,12 @@
           </div>
           </div>
         
-      <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#exampleModal1" data-whatever="@mdo1">SEND</button>
-        <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="send" aria-hidden="true">
+      <button type="button" id="myBtn1{{forloop.counter}}" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal1{{forloop.counter}}">SEND</button>
+        <div class="modal fade" id="myModal1{{forloop.counter}}" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Authentication</h5>
+                <h5 class="modal-title" id="exampleModalLabel1{{forloop.counter}}">Authentication</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                   </button>
@@ -90,7 +90,7 @@
                 <form method="post" action="{% url 'email_agreement' pk ems%}">
                 {% csrf_token %}
                 <label for="password">Enter the Password: </label>
-                <input id="password" type="password" name="password" class="breadcrumb-item">
+                <input id="password1{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
                 <button type="submit"  class="btn btn-success btn-sm">Send</button>
 
                 </form>

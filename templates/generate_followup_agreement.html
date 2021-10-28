@@ -52,8 +52,10 @@
         {% if ems == e.pk %}
                 <li><p></p>
                     <p><b>JBL ID:</b> {{e.file_name}}<br/>
-                    <b>Description:</b> {{e.caption}}<br/>
-                    <b>Credit:</b> {{e.credit_line}}</p>
+                    <b>Caption:</b> {{e.caption}}<br/>
+                    <b>Description:</b> {{e.description}}<br/>
+                    <b>Credit Line:</b> {{e.credit_line}}<br/>
+                    {% if e.source_link != '' %}<b>Source:</b> {{e.source_link}}{% endif %}</p>
                 </li>
         {% endif %}
     {% endfor %}    

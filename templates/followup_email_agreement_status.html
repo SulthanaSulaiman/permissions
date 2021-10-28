@@ -14,9 +14,16 @@
 
 {% block content %}
 {%  if internet_socket %}
+{% if status %}
 <div class="alert alert-success" role="alert">
 Followup agreement successfully sent to {{e_list}}
 </div>
+
+{% else %}
+<div class="alert alert-warning" role="alert">
+Email not sent. Please check your Password!
+</div>
+{%endif%}
 {% else %}
 <div class="alert alert-warning" role="alert">
 Email not sent. Please check your internet connection!
