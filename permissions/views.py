@@ -857,13 +857,13 @@ def email_agreement(request, pk, ems):
         internet_socket = False
     
     user = request.user.username
-    
-    for ems in ems_list:
-        for e in element:
-            if ems==e.pk:
-                e.requested_on=timezone.now()
-                e.save()
-                logger.info("Email agreement sent for ISBN {}, chapter {}, element {} by user {} at {}".format(book.isbn, e.unit.chapter_number, e.element_number, user, timezone.now()))
+    if internet_socket==True and status==True:
+        for ems in ems_list:
+            for e in element:
+                if ems==e.pk:
+                    e.requested_on=timezone.now()
+                    e.save()
+                    logger.info("Email agreement sent for ISBN {}, chapter {}, element {} by user {} at {}".format(book.isbn, e.unit.chapter_number, e.element_number, user, timezone.now()))
     return render(request, 'email_agreement_status.html', {'book': book, 'user': user_data, 'e_list': e_list, 'internet_socket': internet_socket,'status':status})
 
 
@@ -1395,14 +1395,15 @@ def followup_email_agreement(request, pk, ems):
         if e.errno == 8:
             print('There was an error sending an email: ', e)
         internet_socket = False
-
+    user = request.user.username
     user = User.objects.get(username=request.user.username)
-    for ems in ems_list:
-        for e in element:
-            if ems==e.pk:
-                e.follow_up.create(followedup_at=timezone.now(), followedup_by=user)
-                e.save()
-                logger.info("Followup date updated to {} for ISBN {}, chapter {}, element {} by {} at {}".format(timezone.now(), book.isbn, e.unit.chapter_number, e.element_number, user, timezone.now()))  
+    if internet_socket==True and status==True:
+        for ems in ems_list:
+            for e in element:
+                if ems==e.pk:
+                    e.follow_up.create(followedup_at=timezone.now(), followedup_by=user)
+                    e.save()
+                    logger.info("Followup date updated to {} for ISBN {}, chapter {}, element {} by {} at {}".format(timezone.now(), book.isbn, e.unit.chapter_number, e.element_number, user, timezone.now()))  
     return render(request, 'followup_email_agreement_status.html', {'book': book, 'user': user_data, 'e_list': e_list, 'internet_socket': internet_socket,'status':status})
 
 def test_followup_email_agreement_old(request, pk, ems):
@@ -1741,10 +1742,10 @@ def followup_email_agreement_e(request, pk, pk1, pk2):
         if e.errno == 8:
             print('There was an error sending an email: ', e)
         internet_socket = False
-
-    element.follow_up.create(followedup_at=timezone.now(), followedup_by=user)
-    element.save()
-    logger.info("Followup date updated to {} for ISBN {}, chapter {}, element {} by {} at {}".format(timezone.now(), book.isbn, unit.chapter_number, element.element_number, user, timezone.now()))  
+    if internet_socket==True and status==True:
+        element.follow_up.create(followedup_at=timezone.now(), followedup_by=user)
+        element.save()
+        logger.info("Followup date updated to {} for ISBN {}, chapter {}, element {} by {} at {}".format(timezone.now(), book.isbn, unit.chapter_number, element.element_number, user, timezone.now()))  
     return render(request, 'followup_email_agreement_status.html', {'book': book, 'user': user_data, 'e_list': e_list, 'internet_socket': internet_socket,'status':status})
 def test_followup_email_agreement_e_old(request, pk, pk1, pk2):
     book = get_object_or_404(Book, pk=pk)
