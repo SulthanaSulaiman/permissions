@@ -51,6 +51,9 @@ from email.header import Header
 import os
 from .forms import PasswordForm
 
+
+import shutil
+
 from pytz import UTC
 
 logging.config.dictConfig({
@@ -615,6 +618,7 @@ def book_list(request):
     context.default_factory = None
     return render(request, "booklist.html", {'context': context, 'book': book})
 
+
 def unit_list(request, pk):
     book = get_object_or_404(Book, pk=pk)
 #    unit = get_object_or_404(Unit, pk=pk1)
@@ -625,14 +629,28 @@ def unit_list(request, pk):
         
     element = Element.objects.filter(unit__book=pk, requested_on=None)
     missing_images = []
+    element1=[]
     for e in element:
         image="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, e.unit.book.isbn,e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
+        image1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, e.unit.book.isbn,e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
         if not path.exists(image):
-            im = "{}_CH{}_{}{}.png".format(e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
-            missing_images.append(im)
+            if not path.exists(image1):
+                im = "{}_CH{}_{}{}.png".format(e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
+                missing_images.append(im)
+            else:
+                im1="{}/documents/pdf.png".format(media_path)
+                im2="{}/documents/{}/resized/".format(media_path, e.unit.book.isbn)
+                #print("im1=",im1)
+                #print("im2=",im2)
+                shutil.copy(im1,im2)
+                
+                pdf_image="{}/documents/{}/resized/pdf.png".format(media_path, e.unit.book.isbn)
+                name="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, e.unit.book.isbn,e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
+                os.rename(pdf_image,name)
 
+         
     if len(missing_images) != 0:
-        return render(request, 'some_images_missing.html', {'book': book, 'missing_images': missing_images})
+        return render(request, 'some_images_missing.html', {'book': book, 'missing_images': missing_images,'element1':element1})
 
     context = defaultdict(list)
     dict(context)
@@ -649,7 +667,7 @@ def unit_list(request, pk):
         s=source,credit_line,rh_email
         context[s].append(p.pk)
     context.default_factory = None
-    return render(request, "elementlist.html", {'context': context, 'element': element, 'pk': pk, 'book': book, })
+    return render(request, "elementlist.html", {'context': context, 'element': element, 'pk': pk, 'book': book,'element1':element1})
 
 # def book_list(request):
 #     context = Book.objects.values_list('active', flat=True).distinct()
@@ -809,19 +827,41 @@ def email_agreement(request, pk, ems):
         for e in element:
             if ems==e.pk:
                 links="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
-                if path.exists(links):
-                    if e.element_type == "Photo":
-                        print(links)
-                        #message.attach_file(links)
-                    def add_imag():
-                        with open(links, 'rb') as f:
-                                
-                            msg_image = MIMEImage(f.read(), name=os.path.basename(links))
-                        msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
-                        return msg_image
+                links1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
+                if (path.exists(links)and path.exists(links1)):
+                    exists=True
+                else:
+                    exists=False
+                if (exists):
+                    links1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
+                    if path.exists(links1):
+                        if e.element_type == "TAB" or e.element_type == "FTR" :
+                            print(links1)
+                            #message.attach_file(links)
+                        def add_file():
+                            with open(links1, 'rb') as f:
+                                msg_file  = MIMEBase('application', 'octate-stream', Name=os.path.basename(links1))
+                                msg_file .set_payload((f).read())    
+                            encoders.encode_base64(msg_file)
+                            msg_file.add_header('Content-Decomposition', 'attachment', filename=os.path.basename(links1))
+                            
+                            return msg_file
+                        
+                        message.attach(add_file())
+                else:
+                    if path.exists(links):
+                        if e.element_type == "Photo":
+                            print(links)
+                            #message.attach_file(links)
+                        def add_imag():
+                            with open(links, 'rb') as f:
+                                    
+                                msg_image = MIMEImage(f.read(), name=os.path.basename(links))
+                            msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
+                            return msg_image
+                        
+                        message.attach(add_imag())
                     
-                message.attach(add_imag())
-
     text = message.as_string()
     #sending mail
     internet_socket = True
@@ -941,21 +981,21 @@ def test_email_agreement(request, pk, ems):
     imag_calc_name=''
     source=''
     ems_element_type = []
+    
     for ems in ems_list:
         for e in element:
             if ems==e.pk:
                 source = e.source
                 imag_calc_name=e.imag_calc_name
                 rs_name=e.jbl_rh_name
-                
+                              
                 ems_element_type.append(e.element_type)
+    
     subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
-   
+    
     source1 = source.replace(" ", "_")
     user_data = User.objects.get(username=request.user.username)
     body = render_to_string("emailbody.html", {'ems_list': ems_list, 'element': element, 'user': user_data,'rs_name':rs_name})
-    #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', [request.user.email])
-    #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', [request.user.email],reply_to=[request.user.email])
     
     # Create a multipart message and set headers
     message = MIMEMultipart()
@@ -995,19 +1035,41 @@ def test_email_agreement(request, pk, ems):
         for e in element:
             if ems==e.pk:
                 links="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
-                if path.exists(links):
-                    if e.element_type == "Photo":
-                        print(links)
-                        #message.attach_file(links)
-                    def add_imag():
-                        with open(links, 'rb') as f:
-                                
-                            msg_image = MIMEImage(f.read(), name=os.path.basename(links))
-                        msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
-                        return msg_image
+                links1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
+                if (path.exists(links)and path.exists(links1)):
+                    exists=True
+                else:
+                    exists=False
+                if (exists):
+                    links1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
+                    if path.exists(links1):
+                        if e.element_type == "TAB" or e.element_type == "FTR" :
+                            print(links1)
+                            #message.attach_file(links)
+                        def add_file():
+                            with open(links1, 'rb') as f:
+                                msg_file  = MIMEBase('application', 'octate-stream', Name=os.path.basename(links1))
+                                msg_file .set_payload((f).read())    
+                            encoders.encode_base64(msg_file)
+                            msg_file.add_header('Content-Decomposition', 'attachment', filename=os.path.basename(links1))
+                            
+                            return msg_file
+                        
+                        message.attach(add_file())
+                else:
+                    if path.exists(links):
+                        if e.element_type == "Photo":
+                            print(links)
+                            #message.attach_file(links)
+                        def add_imag():
+                            with open(links, 'rb') as f:
+                                    
+                                msg_image = MIMEImage(f.read(), name=os.path.basename(links))
+                            msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
+                            return msg_image
+                        
+                        message.attach(add_imag())
                     
-                message.attach(add_imag())
-
     text = message.as_string()
     #sending mail
     internet_socket = True
@@ -1342,26 +1404,46 @@ def followup_email_agreement(request, pk, ems):
     message.attach(attach_file)
     # email.send()
     
-
-
     #attach photos
     for ems in ems_list:
         for e in element:
             if ems==e.pk:
                 links="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
-                if path.exists(links):
-                    if e.element_type == "Photo":
-                        print(links)
-                        #message.attach_file(links)
-                    def add_imag():
-                        with open(links, 'rb') as f:
-                                
-                            msg_image = MIMEImage(f.read(), name=os.path.basename(links))
-                        msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
-                        return msg_image
+                links1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
+                if (path.exists(links)and path.exists(links1)):
+                    exists=True
+                else:
+                    exists=False
+                if (exists):
+                    links1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
+                    if path.exists(links1):
+                        if e.element_type == "TAB" or e.element_type == "FTR" :
+                            print(links1)
+                            #message.attach_file(links)
+                        def add_file():
+                            with open(links1, 'rb') as f:
+                                msg_file  = MIMEBase('application', 'octate-stream', Name=os.path.basename(links1))
+                                msg_file .set_payload((f).read())    
+                            encoders.encode_base64(msg_file)
+                            msg_file.add_header('Content-Decomposition', 'attachment', filename=os.path.basename(links1))
+                            
+                            return msg_file
+                        
+                        message.attach(add_file())
+                else:
+                    if path.exists(links):
+                        if e.element_type == "Photo":
+                            print(links)
+                            #message.attach_file(links)
+                        def add_imag():
+                            with open(links, 'rb') as f:
+                                    
+                                msg_image = MIMEImage(f.read(), name=os.path.basename(links))
+                            msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
+                            return msg_image
+                        
+                        message.attach(add_imag())
                     
-                message.attach(add_imag())
-
     text = message.as_string()
     #sending mail
     internet_socket = True
@@ -1528,19 +1610,41 @@ def test_followup_email_agreement(request, pk, ems):
         for e in element:
             if ems==e.pk:
                 links="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
-                if path.exists(links):
-                    if e.element_type == "Photo":
-                        print(links)
-                        #message.attach_file(links)
-                    def add_imag():
-                        with open(links, 'rb') as f:
-                                
-                            msg_image = MIMEImage(f.read(), name=os.path.basename(links))
-                        msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
-                        return msg_image
+                links1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
+                if (path.exists(links)and path.exists(links1)):
+                    exists=True
+                else:
+                    exists=False
+                if (exists):
+                    links1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, e.unit.book.isbn,e.unit.book.isbn,e.unit.chapter_number,e.shortform(),e.element_number)
+                    if path.exists(links1):
+                        if e.element_type == "TAB" or e.element_type == "FTR" :
+                            print(links1)
+                            #message.attach_file(links)
+                        def add_file():
+                            with open(links1, 'rb') as f:
+                                msg_file  = MIMEBase('application', 'octate-stream', Name=os.path.basename(links1))
+                                msg_file .set_payload((f).read())    
+                            encoders.encode_base64(msg_file)
+                            msg_file.add_header('Content-Decomposition', 'attachment', filename=os.path.basename(links1))
+                            
+                            return msg_file
+                        
+                        message.attach(add_file())
+                else:
+                    if path.exists(links):
+                        if e.element_type == "Photo":
+                            print(links)
+                            #message.attach_file(links)
+                        def add_imag():
+                            with open(links, 'rb') as f:
+                                    
+                                msg_image = MIMEImage(f.read(), name=os.path.basename(links))
+                            msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
+                            return msg_image
+                        
+                        message.attach(add_imag())
                     
-                message.attach(add_imag())
-
     text = message.as_string()
     #sending mail
     internet_socket = True
@@ -1695,20 +1799,39 @@ def followup_email_agreement_e(request, pk, pk1, pk2):
 
     # email.send()  
 
-    
+    #attach photos
+
     links="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, element.unit.book.isbn,element.unit.book.isbn,element.unit.chapter_number,element.shortform(),element.element_number)
-    print(links)
-    if path.exists(links):
-        if element.element_type == "Photo":
-         print(links)
-                        #message.attach_file(links)
-        def add_imag():
-            with open(links, 'rb') as f:
-                msg_image = MIMEImage(f.read(), name=os.path.basename(links))
-            msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
-            return msg_image
-                    
-        message.attach(add_imag())
+    links1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, element.unit.book.isbn,element.unit.book.isbn,element.unit.chapter_number,element.shortform(),element.element_number)
+    if (path.exists(links)and path.exists(links1)):
+        exists=True
+    else:
+        exists=False
+    if (exists):
+        links1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, element.unit.book.isbn,element.unit.book.isbn,element.unit.chapter_number,element.shortform(),element.element_number)
+        if path.exists(links1):
+            def add_file():
+                with open(links1, 'rb') as f:
+                    msg_file  = MIMEBase('application', 'octate-stream', Name=os.path.basename(links1))
+                    msg_file .set_payload((f).read())    
+                encoders.encode_base64(msg_file)
+                msg_file.add_header('Content-Decomposition', 'attachment', filename=os.path.basename(links1))
+                            
+                return msg_file
+                        
+            message.attach(add_file())
+    else:
+        links="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, element.unit.book.isbn,element.unit.book.isbn,element.unit.chapter_number,element.shortform(),element.element_number)
+        if path.exists(links):
+            def add_imag():
+                with open(links, 'rb') as f:
+                                    
+                    msg_image = MIMEImage(f.read(), name=os.path.basename(links))
+                msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
+                return msg_image
+                        
+            message.attach(add_imag())
+                  
     text = message.as_string()
 
     internet_socket = True
@@ -1844,20 +1967,39 @@ def test_followup_email_agreement_e(request, pk, pk1, pk2):
 
     # email.send()  
 
-    
+    #attach photos
+
     links="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, element.unit.book.isbn,element.unit.book.isbn,element.unit.chapter_number,element.shortform(),element.element_number)
-    print(links)
-    if path.exists(links):
-        if element.element_type == "Photo":
-         print(links)
-                        #message.attach_file(links)
-        def add_imag():
-            with open(links, 'rb') as f:
-                msg_image = MIMEImage(f.read(), name=os.path.basename(links))
-            msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
-            return msg_image
-                    
-        message.attach(add_imag())
+    links1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, element.unit.book.isbn,element.unit.book.isbn,element.unit.chapter_number,element.shortform(),element.element_number)
+    if (path.exists(links)and path.exists(links1)):
+        exists=True
+    else:
+        exists=False
+    if (exists):
+        links1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, element.unit.book.isbn,element.unit.book.isbn,element.unit.chapter_number,element.shortform(),element.element_number)
+        if path.exists(links1):
+            def add_file():
+                with open(links1, 'rb') as f:
+                    msg_file  = MIMEBase('application', 'octate-stream', Name=os.path.basename(links1))
+                    msg_file .set_payload((f).read())    
+                encoders.encode_base64(msg_file)
+                msg_file.add_header('Content-Decomposition', 'attachment', filename=os.path.basename(links1))
+                            
+                return msg_file
+                        
+            message.attach(add_file())
+    else:
+        links="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, element.unit.book.isbn,element.unit.book.isbn,element.unit.chapter_number,element.shortform(),element.element_number)
+        if path.exists(links):
+            def add_imag():
+                with open(links, 'rb') as f:
+                                    
+                    msg_image = MIMEImage(f.read(), name=os.path.basename(links))
+                msg_image.add_header('Content-ID', '<{}>'.format(os.path.basename(links)))
+                return msg_image
+                        
+            message.attach(add_imag())
+                  
     text = message.as_string()
 
     internet_socket = True

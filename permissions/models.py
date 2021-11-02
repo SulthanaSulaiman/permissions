@@ -146,7 +146,7 @@ class Element(models.Model):
     title = models.CharField(max_length=200, null=True, blank=True)
     # rh_email = models.CharField(max_length=200, null=True)
     # alt_email = models.EmailField(null=True, blank=True)
-    # rh_address = models.TextField(max_length=300, null=True, blank=True)
+    rh_address = models.TextField(max_length=300, null=True, blank=True)
     # phone = models.CharField(max_length=20, null=True, blank=True)
     # fax = models.CharField(max_length=20, null=True, blank=True)
     insert_1 = models.CharField(max_length=200, null=True, blank=True)

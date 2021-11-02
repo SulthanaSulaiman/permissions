@@ -33,12 +33,12 @@
             <b> Caption:</b> {{e.caption}}</td>
             <td style="width:30%"><img width="200" src="/media/documents/{{e.unit.book.isbn}}/resized/{{e.unit.book.isbn}}_CH{{e.unit.chapter_number}}_{{e.shortform}}{{e.element_number}}.png"/></td></tr>
             <tr><td></td><td colspan="4" valign="middle"><b>{% if e.get_followup_count > 0%}First {% endif %} Permission requested: </b> {{e.requested_on|timesince}} ago 
-             <button type="button" id="myBtn4{{forloop.counter}}" class="btn btn-secondary btn-sm" data-toggle="modal"  data-target="#myModal4{{forloop.counter}}">TEST</button>
-                <div class="modal fade"  id="myModal4{{forloop.counter}}" tabindex="-1" role="dialog">
+             <button type="button" id="myBtnTFE{{forloop.counter}}" class="btn btn-secondary btn-sm" data-toggle="modal"  data-target="#myModalTFE{{forloop.counter}}">TEST</button>
+                <div class="modal fade"  id="myModalTFE{{forloop.counter}}" tabindex="-1" role="dialog">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel4{{forloop.counter}}">Authentication</h5>
+                        <h5 class="modal-title" id="exampleModalLabelTFE{{forloop.counter}}">Authentication</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                         </button>
@@ -47,19 +47,19 @@
                         <form method="post" action="{% url 'test_followup_email_agreement_e' e.unit.book.pk e.unit.pk e.pk%}">
                           {% csrf_token %}
                           <label for="password">Enter the Password: </label>
-                          <input id="password4{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
+                          <input id="passwordTFE{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
                           <button type="submit"  class="btn btn-success btn-sm">Send</button>
                         </form>
                       </div>
                     </div>
                   </div>
                 </div>
-              <button type="button" id="myBtn5{{forloop.counter}}" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#myModal5{{forloop.counter}}">FOLLOWUP</button>
-                <div class="modal fade"  id="myModal5{{forloop.counter}}" tabindex="-1" role="dialog">
+              <button type="button" id="myBtnSFE{{forloop.counter}}" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#myModalSFE{{forloop.counter}}">FOLLOWUP</button>
+                <div class="modal fade"  id="myModalSFE{{forloop.counter}}" tabindex="-1" role="dialog">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel5{{forloop.counter}}">Authentication</h5>
+                        <h5 class="modal-title" id="exampleModalLabelSFE{{forloop.counter}}">Authentication</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                         </button>
@@ -68,7 +68,7 @@
                         <form method="post" action="{% url 'followup_email_agreement_e' e.unit.book.pk e.unit.pk e.pk%}">
                           {% csrf_token %}
                           <label for="password">Enter the Password: </label>
-                          <input id="password5{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
+                          <input id="passwordSFE{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
                           <button type="submit"  class="btn btn-success btn-sm">Send</button>
                         </form>
                       </div>
@@ -91,12 +91,12 @@
        class="btn btn-primary btn-sm"
        role="button">FOLLOWUP OLD</a> {% endcomment %}
       
-       <button type="button" id="myBtn2{{forloop.counter}}" class="btn btn-secondary btn-sm" data-toggle="modal"  data-target="#myModal2{{forloop.counter}}">TEST</button>
-          <div class="modal fade"  id="myModal2{{forloop.counter}}" tabindex="-1" role="dialog">
+       <button type="button" id="myBtnTF{{forloop.counter}}" class="btn btn-secondary btn-sm" data-toggle="modal"  data-target="#myModalTF{{forloop.counter}}">TEST</button>
+          <div class="modal fade"  id="myModalTF{{forloop.counter}}" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel2{{forloop.counter}}">Authentication</h5>
+                  <h5 class="modal-title" id="exampleModalLabelTF{{forloop.counter}}">Authentication</h5>
                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -105,19 +105,19 @@
                   <form method="post" action="{% url 'test_followup_email_agreement' pk ems%}">
                   {% csrf_token %}
                   <label for="password">Enter the Password: </label>
-                  <input id="password2{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
+                  <input id="passwordTF{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
                   <button type="submit"  class="btn btn-success btn-sm">Send</button>
                   </form>
                 </div>
               </div>
             </div>
           </div>
-        <button type="button" id="myBtn3{{forloop.counter}}" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal3{{forloop.counter}}">FOLLOWUP</button>
-          <div class="modal fade" id="myModal3{{forloop.counter}}" tabindex="-1" role="dialog">
+        <button type="button" id="myBtnSF{{forloop.counter}}" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalSF{{forloop.counter}}">FOLLOWUP</button>
+          <div class="modal fade" id="myModalSF{{forloop.counter}}" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel3{{forloop.counter}}">Authentication</h5>
+                  <h5 class="modal-title" id="exampleModalLabelSF{{forloop.counter}}">Authentication</h5>
                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -126,7 +126,7 @@
                   <form method="post" action="{% url 'followup_email_agreement' pk ems%}">
                   {% csrf_token %}
                   <label for="password">Enter the Password: </label>
-                  <input id="password3{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
+                  <input id="passwordSF{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
                   <button type="submit"  class="btn btn-success btn-sm">Send</button>
                   </form>
                 </div>

@@ -22,6 +22,7 @@
 </div>
 
 <div class="alert alert-warning" role="alert">
+<p>Missing files or Images</p>
 <p>Following imag{{ missing_images|pluralize:"e,es" }} {{ missing_images|pluralize:"is,are" }} mssing for ISBN {{book.isbn}} inside 'documents' folder:</p>
 {% for m in missing_images %}
 <p>{{m}}<p>

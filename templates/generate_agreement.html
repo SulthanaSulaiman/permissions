@@ -26,13 +26,10 @@
 <body>
 <p><span style="float:right;"><b>Date: {% now "m/d/Y" %}</b></span></p>
 <p style="text-align:left;"><b>{% with element.all|first as e %}
-  <b>{{ e.contact.rh_address |linebreaksbr }}</b>
+  <b>{{ e.rh_address |linebreaksbr }}</b>
 {% endwith %}</b>
 </p>
 <br/>
-{% with element.all|first as e %}
-    {{e.unit.book.publisher.publisher_imprint}}
-{% endwith %}
 <p><b>Dear Permission Manager,</b></p>
 <p>Ascend Learning, LLC (together with Ascend Affiliates, including, without limitation, Jones & Bartlett Learning, LLC, (collectively referred to herein as “Ascend Learning”) is currently preparing the educational product listed below (“Ascend Learning Material”). For purposes hereof, “Ascend Affiliates” shall include all companies controlled by, or under common control of, Ascend Learning, LLC.</p>
 <p>{% with element.all|first as e %}
