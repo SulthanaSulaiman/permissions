@@ -804,7 +804,7 @@ def email_agreement(request, pk, ems):
 
     #generate agreement
 
-    html = render_to_string("generate_agreement.html", {'ems_list': ems_list, 'element': element})
+    html = render_to_string("generate_agreement.html", {'ems_list': ems_list, 'element': element,'address':address})
     out = BytesIO()
     
     stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
