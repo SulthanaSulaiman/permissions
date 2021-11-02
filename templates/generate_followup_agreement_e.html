@@ -21,9 +21,11 @@
 </head>
 {% block content %}
 <body>
-<p><span style="float:right;"><b>Date: {% now "m/d/Y" %}</b></span></p>
+<p></b> <span style="float:right;"><b>Date: {% now "m/d/Y" %}</b><p></span><br/>
 <p style="text-align:left;">
-  <b>{{ element.contact.rh_address|linebreaksbr }}</b>
+{% for a in address%}
+  <b>{{a}},</b><br/>
+{% endfor%}
 </p>
 <br/>
 <p><b>Dear Permission Manager,</b></p>
@@ -38,8 +40,9 @@
 <p>Sincerely,</p>
 <p>
   {{ element.jbl_rh_name }}
+  <p>Jones & Bartlett Learning.</p>
 <p style="page-break-after: always" ></p>
-<p>Jones & Bartlett Learning.</p>
+
 
 <p><b>CONTENT BEING REQUESTED:</b></p>
                     <p><b>JBL ID:</b> {{element.file_name}}<br/>

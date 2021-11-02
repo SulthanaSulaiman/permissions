@@ -23,9 +23,11 @@
 </head>
 {% block content %}
 <body>
-<p style="text-align:left;"><b>{% with element.all|first as e %}
-  <b>{{ e.contact.rh_address|linebreaksbr }}</b>
-{% endwith %}</b> <span style="float:right;"><b>Date: {% now "m/d/Y" %}</b></span><br/>
+<p></b> <span style="float:right;"><b>Date: {% now "m/d/Y" %}</b><p></span><br/>
+<p style="text-align:left;">
+{% for a in address%}
+  <b>{{a}},</b><br/>
+{% endfor%}
 </p>
 <br/>
 <p><b>Dear Permission Manager,</b></p>
@@ -41,9 +43,8 @@
 <p>{% with element.all|first as e %}
   {{ e.jbl_rh_name }}
 {% endwith %}</p>
-<p style="page-break-after: always" ></p>
 <p>Jones & Bartlett Learning.</p>
-
+<p style="page-break-after: always" ></p>
 <p><b>CONTENT BEING REQUESTED:</b></p>
 
 <ol>    

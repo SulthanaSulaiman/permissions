@@ -775,10 +775,12 @@ def email_agreement(request, pk, ems):
                 source = e.source
                 imag_calc_name=e.imag_calc_name
                 rs_name=e.jbl_rh_name
+                rh_address=e.rh_address  
                 
                 ems_element_type.append(e.element_type)
     subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
-   
+    address=[]
+    address=rh_address.split(',')
     source1 = source.replace(" ", "_")
     e_list = email_rh.split (",")
     user_data = User.objects.get(username=request.user.username)
@@ -988,11 +990,12 @@ def test_email_agreement(request, pk, ems):
                 source = e.source
                 imag_calc_name=e.imag_calc_name
                 rs_name=e.jbl_rh_name
-                              
+                rh_address=e.rh_address           
                 ems_element_type.append(e.element_type)
     
     subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
-    
+    address=[]
+    address=rh_address.split(',')
     source1 = source.replace(" ", "_")
     user_data = User.objects.get(username=request.user.username)
     body = render_to_string("emailbody.html", {'ems_list': ems_list, 'element': element, 'user': user_data,'rs_name':rs_name})
@@ -1010,7 +1013,7 @@ def test_email_agreement(request, pk, ems):
 
     #generate agreement
 
-    html = render_to_string("generate_agreement.html", {'ems_list': ems_list, 'element': element})
+    html = render_to_string("generate_agreement.html", {'ems_list': ems_list, 'element': element,'address':address})
     out = BytesIO()
     
     stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
@@ -1353,9 +1356,11 @@ def followup_email_agreement(request, pk, ems):
                 source = e.source
                 imag_calc_name=e.imag_calc_name
                 rs_name = e.jbl_rh_name
+                rh_address=e.rh_address
     #if jbl_rh_name=='':
     #    return redirect('unit_list', pk=book.pk)
-
+    address=[]
+    address=rh_address.split(',')
     source1 = source.replace(" ", "_")
                 #dates=e.follow_up.all()
 
@@ -1384,7 +1389,7 @@ def followup_email_agreement(request, pk, ems):
 
     #generate agreement
 
-    html = render_to_string("generate_followup_agreement.html", {'ems_list': ems_list, 'element': element})
+    html = render_to_string("generate_followup_agreement.html", {'ems_list': ems_list, 'element': element,'address':address})
     out = BytesIO()
     stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(out, stylesheets=stylesheets)
@@ -1562,10 +1567,11 @@ def test_followup_email_agreement(request, pk, ems):
                 source = e.source
                 imag_calc_name=e.imag_calc_name
                 rs_name=e.jbl_rh_name
-                #print("if ................")
+                rh_address=e.rh_address
                 ems_element_type.append(e.element_type)
     subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
-   
+    address=[]
+    address=rh_address.split(',')
     source1 = source.replace(" ", "_")
     user_data = User.objects.get(username=request.user.username)
     body = render_to_string("emailbody_followup.html", {'ems_list': ems_list, 'element': element, 'user': user_data,'rs_name':rs_name})
@@ -1585,7 +1591,7 @@ def test_followup_email_agreement(request, pk, ems):
 
     #generate agreement
 
-    html = render_to_string("generate_followup_agreement.html", {'ems_list': ems_list, 'element': element})
+    html = render_to_string("generate_followup_agreement.html", {'ems_list': ems_list, 'element': element,'address':address})
     out = BytesIO()
     
     stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
@@ -1749,8 +1755,13 @@ def followup_email_agreement_e(request, pk, pk1, pk2):
     password=request.POST.get('password')
     #print(password)
 
+
     email_rh = element.rh_email
     e_list = email_rh.split (",")
+
+    rh_address=element.rh_address
+    address=[]
+    address=rh_address.split(',')
 
     sender_email = request.user.email
     receiver_email = email_rh
@@ -1776,7 +1787,7 @@ def followup_email_agreement_e(request, pk, pk1, pk2):
     message.attach(part)
 
     #generate agreement
-    html = render_to_string("generate_followup_agreement_e.html", {'element': element})
+    html = render_to_string("generate_followup_agreement_e.html", {'element': element,'address':address})
     out = BytesIO()
     stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(out, stylesheets=stylesheets)
@@ -1923,6 +1934,10 @@ def test_followup_email_agreement_e(request, pk, pk1, pk2):
     sender_email = request.user.email
     receiver_email = request.user.email
 
+    rh_address=element.rh_address
+    address=[]
+    address=rh_address.split(',')
+
     imag_calc_name=element.imag_calc_name
     source=element.source   
     rs_name=element.jbl_rh_name
@@ -1944,7 +1959,7 @@ def test_followup_email_agreement_e(request, pk, pk1, pk2):
     message.attach(part)
 
     #generate agreement
-    html = render_to_string("generate_followup_agreement_e.html", {'element': element})
+    html = render_to_string("generate_followup_agreement_e.html", {'element': element,'address':address})
     out = BytesIO()
     stylesheets = [weasyprint.CSS(settings.STATIC_ROOT + 'css/pdf.css')]
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri("/")).write_pdf(out, stylesheets=stylesheets)
