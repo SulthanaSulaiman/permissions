@@ -28,7 +28,11 @@
 <p><span style="float:right;"><b>Date: {% now "m/d/Y" %}</b></span></p>
 <p style="text-align:left;">
 {% for a in address%}
+{% if forloop.last%}
+<b>{{a}}.</b><br/>
+{% else %}
   <b>{{a}},</b><br/>
+{%endif%}
 {% endfor%}
 </p>
 <br/>

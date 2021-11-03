@@ -677,7 +677,14 @@ def unit_list(request, pk):
 def generate_agreement(request, pk, ems):
     element = Element.objects.filter(unit__book=pk)
     ems_list = json.loads(ems)
-    html = render_to_string("generate_agreement.html", {'ems_list': ems_list, 'element': element})
+    for ems in ems_list:
+        for e in element:
+            if ems==e.pk:
+                rh_address=e.rh_address  
+                
+    address=[]
+    address=rh_address.split(',')           
+    html = render_to_string("generate_agreement.html", {'ems_list': ems_list, 'element': element,'address':address})
     response = HttpResponse(content_type="application/pdf")
     response['Content-Disposition'] = 'attachment; filename="agreement_{}.pdf"'.format(pk)
     response['Content-Disposition'] = 'filename="agreement_{}.pdf"'.format(pk)
