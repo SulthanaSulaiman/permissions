@@ -29,13 +29,12 @@
 <p style="text-align:left;">
 {% for a in address%}
 {% if forloop.last%}
-<b>{{a}}.</b><br/>
+<b>{{a}}.</b><br>
 {% else %}
-  <b>{{a}},</b><br/>
+  <b>{{a}},</b><br>
 {%endif%}
 {% endfor%}
 </p>
-<br/>
 <p><b>Dear Permission Manager,</b></p>
 <p>Ascend Learning, LLC (together with Ascend Affiliates, including, without limitation, Jones & Bartlett Learning, LLC, (collectively referred to herein as “Ascend Learning”) is currently preparing the educational product listed below (“Ascend Learning Material”). For purposes hereof, “Ascend Affiliates” shall include all companies controlled by, or under common control of, Ascend Learning, LLC.</p>
 <p>{% with element.all|first as e %}
@@ -47,7 +46,7 @@
 <p>I would appreciate your consent to this request at your earliest convenience. If you do sign and return this Agreement, any other contrary or conflicting terms you may attach or provide (on an invoice or otherwise) or changes you may make to the rights described above will not apply. If you prefer to use your own license or permission agreement instead, please note that it must include the rights described above. This Agreement is governed by the laws of the Commonwealth of Massachusetts. Thank you.</p>
 <p>Sincerely,</p>
 <p>{% with element.all|first as e %}
-  {{ e.jbl_rh_name }}
+  {{ e.jbl_rh_name }},
 {% endwith %}</p>
 <p>Jones & Bartlett Learning.</p>
 <p style="page-break-after: always" ></p>
