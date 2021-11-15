@@ -47,8 +47,8 @@
 <p>Sincerely,</p>
 <p>{% with element.all|first as e %}
   {{ e.jbl_rh_name }},
-{% endwith %}</p>
-<p>Jones & Bartlett Learning.</p>
+</p>
+<p>{{e.unit.book.publisher.publisher_name}}.</p>{% endwith %}
 <p style="page-break-after: always" ></p>
 <p><b>CONTENT BEING REQUESTED:</b></p>
 

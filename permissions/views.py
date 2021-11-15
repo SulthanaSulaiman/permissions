@@ -181,9 +181,17 @@ class BookListView(ListView):
     context_object_name = 'books'
     paginate_by = 8
     template_name = 'home.html'
+    def get_context_data(self, **kwargs):
+        kwargs['user'] = self.request.user
+        kwargs['group'] = self.request.user.groups.values_list('name', flat=True).first()
+        return super().get_context_data(**kwargs)
     
     def get_queryset(self):
-        queryset = Book.objects.filter(active=True).order_by('-created_at')
+        group= self.request.user.groups.values_list('name', flat=True).first()
+        if group=='admin':
+            queryset = Book.objects.filter(active=True).order_by('-created_at')
+        else:
+            queryset = Book.objects.filter(user=self.request.user,active=True).order_by('-created_at')
         return queryset
 
 class BookListInactiveView(ListView):
@@ -191,9 +199,12 @@ class BookListInactiveView(ListView):
     context_object_name = 'books'
     paginate_by = 8
     template_name = 'home_inactive.html'
-    
     def get_queryset(self):
-        queryset = Book.objects.filter(active=False).order_by('-created_at')
+        group= self.request.user.groups.values_list('name', flat=True).first()
+        if group=='admin':
+            queryset = Book.objects.filter(active=False).order_by('-created_at')
+        else:
+            queryset = Book.objects.filter(user=self.request.user,active=False).order_by('-created_at')
         return queryset
 
 @method_decorator(login_required, name='dispatch')
@@ -418,7 +429,7 @@ def test(request):
 @method_decorator(login_required, name='dispatch')
 class BookUpdateView(UpdateView):
     model = Book
-    fields = ('isbn', 'title', 'edition', 'active')
+    fields = ('isbn', 'title', 'edition', 'active','user')
     template_name = 'edit_book.html'
     pk_url_kwarg = 'book_pk'
     context_object_name = 'book_e'

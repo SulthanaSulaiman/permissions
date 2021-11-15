@@ -10,7 +10,7 @@ class NewBookForm(forms.ModelForm):
     class Meta:
         model = Book
          #fields = '__all__'
-        fields = ['publisher', 'title', 'isbn', 'edition', 'active']
+        fields = ['publisher', 'title', 'isbn', 'edition', 'active','user']
 
 class NewUnitForm(forms.ModelForm):
     class Meta:

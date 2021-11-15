@@ -60,9 +60,14 @@ class Book(models.Model):
     objects = models.Manager()
     activated = BookActiveManager()
     created_at = models.DateTimeField(auto_now_add=True, null=True)
+    #user=models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, related_name='user', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
+        #return Book.objects.filter(user=self).title
+        
+
 
     def get_chapters_count(self):
         return self.units.count()
