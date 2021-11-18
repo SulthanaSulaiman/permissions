@@ -73,7 +73,7 @@ def import_data(isbn, data):
                 #element.contact_id = contact.pk
                 # element.rh_email = data['RH e-mail'][i]
                 # element.alt_email = data['Alt - e-mail'][i]
-                element.rh_address = data['RH Address'][i]
+                element.rh_address = data['RH Address'][i] if 'RH Contact' in data else ''
                 # element.phone = data['Phone'][i]
                 # element.fax = data['Fax'][i]
                 element.insert_1 = data['Insert 1'][i] if 'Insert 1' in data else ''

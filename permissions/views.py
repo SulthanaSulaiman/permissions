@@ -429,7 +429,7 @@ def test(request):
 @method_decorator(login_required, name='dispatch')
 class BookUpdateView(UpdateView):
     model = Book
-    fields = ('isbn', 'title', 'edition', 'active','user')
+    fields = ('isbn', 'title', 'edition','active','user','publisher')
     template_name = 'edit_book.html'
     pk_url_kwarg = 'book_pk'
     context_object_name = 'book_e'
@@ -691,10 +691,15 @@ def generate_agreement(request, pk, ems):
     for ems in ems_list:
         for e in element:
             if ems==e.pk:
+                
                 rh_address=e.rh_address  
                 
     address=[]
-    address=rh_address.split(',')           
+    if rh_address is None:
+        address=rh_address
+    else:
+        address=rh_address.split(',')  
+
     html = render_to_string("generate_agreement.html", {'ems_list': ems_list, 'element': element,'address':address})
     response = HttpResponse(content_type="application/pdf")
     response['Content-Disposition'] = 'attachment; filename="agreement_{}.pdf"'.format(pk)
@@ -793,12 +798,17 @@ def email_agreement(request, pk, ems):
                 source = e.source
                 imag_calc_name=e.imag_calc_name
                 rs_name=e.jbl_rh_name
+                ems_element_type.append(e.element_type)
                 rh_address=e.rh_address  
                 
-                ems_element_type.append(e.element_type)
-    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
     address=[]
-    address=rh_address.split(',')
+    if rh_address is None:
+        address=rh_address
+    else:
+        address=rh_address.split(',') 
+
+    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
+    
     source1 = source.replace(" ", "_")
     e_list = email_rh.split (",")
     user_data = User.objects.get(username=request.user.username)
@@ -1007,13 +1017,18 @@ def test_email_agreement(request, pk, ems):
             if ems==e.pk:
                 source = e.source
                 imag_calc_name=e.imag_calc_name
-                rs_name=e.jbl_rh_name
-                rh_address=e.rh_address           
+                rs_name=e.jbl_rh_name    
                 ems_element_type.append(e.element_type)
+                rh_address=e.rh_address  
+                
+    address=[]
+    if rh_address is None:
+        address=rh_address
+    else:
+        address=rh_address.split(',')
     
     subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
-    address=[]
-    address=rh_address.split(',')
+
     source1 = source.replace(" ", "_")
     user_data = User.objects.get(username=request.user.username)
     body = render_to_string("emailbody.html", {'ems_list': ems_list, 'element': element, 'user': user_data,'rs_name':rs_name})
@@ -1374,11 +1389,13 @@ def followup_email_agreement(request, pk, ems):
                 source = e.source
                 imag_calc_name=e.imag_calc_name
                 rs_name = e.jbl_rh_name
-                rh_address=e.rh_address
-    #if jbl_rh_name=='':
-    #    return redirect('unit_list', pk=book.pk)
+                rh_address=e.rh_address  
+                
     address=[]
-    address=rh_address.split(',')
+    if rh_address is None:
+        address=rh_address
+    else:
+        address=rh_address.split(',')
     source1 = source.replace(" ", "_")
                 #dates=e.follow_up.all()
 
@@ -1585,11 +1602,16 @@ def test_followup_email_agreement(request, pk, ems):
                 source = e.source
                 imag_calc_name=e.imag_calc_name
                 rs_name=e.jbl_rh_name
-                rh_address=e.rh_address
                 ems_element_type.append(e.element_type)
-    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
+                rh_address=e.rh_address  
+                
     address=[]
-    address=rh_address.split(',')
+    if rh_address is None:
+        address=rh_address
+    else:
+        address=rh_address.split(',')
+
+    subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
     source1 = source.replace(" ", "_")
     user_data = User.objects.get(username=request.user.username)
     body = render_to_string("emailbody_followup.html", {'ems_list': ems_list, 'element': element, 'user': user_data,'rs_name':rs_name})
@@ -1777,10 +1799,14 @@ def followup_email_agreement_e(request, pk, pk1, pk2):
     email_rh = element.rh_email
     e_list = email_rh.split (",")
 
-    rh_address=element.rh_address
+    rh_address=element.rh_address  
+                
     address=[]
-    address=rh_address.split(',')
-
+    if rh_address is None:
+        address=rh_address
+    else:
+        address=rh_address.split(',')
+    
     sender_email = request.user.email
     receiver_email = email_rh
 
@@ -1951,10 +1977,13 @@ def test_followup_email_agreement_e(request, pk, pk1, pk2):
         
     sender_email = request.user.email
     receiver_email = request.user.email
-
-    rh_address=element.rh_address
+    rh_address=element.rh_address  
+                
     address=[]
-    address=rh_address.split(',')
+    if rh_address is None:
+        address=rh_address
+    else:
+        address=rh_address.split(',')
 
     imag_calc_name=element.imag_calc_name
     source=element.source   
