@@ -36,10 +36,15 @@
         {% for e in element%}
         {% if x == e.pk%}
            {% if e.requested_on == None %}
-            <td style="width:68%"><b>Element Number:</b> {{e.element_number}}<br/>
-            <b> Chapter Number:</b> {{e.unit.chapter_number}}<br/>
-            <b> Caption:</b> {{e.caption}}</td>
-            <td style="width:30%"><img width="200" src="/media/documents/{{e.unit.book.isbn}}/resized/{{e.unit.book.isbn}}_CH{{e.unit.chapter_number}}_{{e.shortform}}{{e.element_number}}.png"/></td></tr>
+              <td style="width:68%"><b>Element Number:</b> {{e.element_number}}<br/>
+              <b> Chapter Number:</b> {{e.unit.chapter_number}}<br/>
+              <b> Caption:</b> {{e.caption}}<br/></td>
+              {% if e.text_data == None %}              
+              <td style="width:30%"><img width="200" src="/media/documents/{{e.unit.book.isbn}}/resized/{{e.unit.book.isbn}}_CH{{e.unit.chapter_number}}_{{e.shortform}}{{e.element_number}}.png"/></td></tr>
+              
+              {% else %}
+              <td style="width:30%"><b> Text:</b> {{e.text_data}}</td></tr>
+              {% endif %}
            {% endif %}
         {%endif%}
         {% endfor %}

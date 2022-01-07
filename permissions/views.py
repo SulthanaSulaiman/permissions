@@ -76,7 +76,7 @@ logging.config.dictConfig({
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'file',
-            'filename': 'E:\\permissions pro\\permissions-master\\log\\debug.log'
+            'filename': 'E:\\permission mgmt v1\\permissions\\log\\debug.log'
         }
     },
     'loggers': {
@@ -634,32 +634,40 @@ def unit_list(request, pk):
     book = get_object_or_404(Book, pk=pk)
 #    unit = get_object_or_404(Unit, pk=pk1)
     media_path = settings.MEDIA_ROOT
+    element = Element.objects.filter(unit__book=pk, requested_on=None)
+
     images_folder="{}/documents/{}".format(media_path, book.isbn)
+ 
+
     if not path.exists(images_folder):
         return render(request, 'no_images.html', {'book': book})
         
     element = Element.objects.filter(unit__book=pk, requested_on=None)
     missing_images = []
     element1=[]
+    txtStatus=0
     for e in element:
-        image="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, e.unit.book.isbn,e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
-        image1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, e.unit.book.isbn,e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
-        if not path.exists(image):
-            if not path.exists(image1):
-                im = "{}_CH{}_{}{}.png".format(e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
-                missing_images.append(im)
-            else:
-                im1="{}/documents/pdf.png".format(media_path)
-                im2="{}/documents/{}/resized/".format(media_path, e.unit.book.isbn)
-                #print("im1=",im1)
-                #print("im2=",im2)
-                shutil.copy(im1,im2)
-                
-                pdf_image="{}/documents/{}/resized/pdf.png".format(media_path, e.unit.book.isbn)
-                name="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, e.unit.book.isbn,e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
-                os.rename(pdf_image,name)
+        
+        if e.element_type != 'Text':
+            txtStatus=1
+            image="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, e.unit.book.isbn,e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
+            image1="{}/documents/{}/resized/{}_CH{}_{}{}.pdf".format(media_path, e.unit.book.isbn,e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
+            if not path.exists(image):
+                if not path.exists(image1):
+                    im = "{}_CH{}_{}{}.png".format(e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
+                    missing_images.append(im)
+                else:
+                    im1="{}/documents/pdf.png".format(media_path)
+                    im2="{}/documents/{}/resized/".format(media_path, e.unit.book.isbn)
+                    #print("im1=",im1)
+                    #print("im2=",im2)
+                    shutil.copy(im1,im2)
+                    
+                    pdf_image="{}/documents/{}/resized/pdf.png".format(media_path, e.unit.book.isbn)
+                    name="{}/documents/{}/resized/{}_CH{}_{}{}.png".format(media_path, e.unit.book.isbn,e.unit.book.isbn, e.unit.chapter_number, e.shortform(), e.element_number)
+                    os.rename(pdf_image,name)
 
-         
+            
     if len(missing_images) != 0:
         return render(request, 'some_images_missing.html', {'book': book, 'missing_images': missing_images,'element1':element1})
 
@@ -678,7 +686,7 @@ def unit_list(request, pk):
         s=source,credit_line,rh_email
         context[s].append(p.pk)
     context.default_factory = None
-    return render(request, "elementlist.html", {'context': context, 'element': element, 'pk': pk, 'book': book,'element1':element1})
+    return render(request, "elementlist.html", {'context': context, 'element': element, 'pk': pk, 'book': book,'element1':element1,'txtStatus':txtStatus})
 
 # def book_list(request):
 #     context = Book.objects.values_list('active', flat=True).distinct()

@@ -129,11 +129,12 @@ class Element(models.Model):
         ('Cover', 'Cover'),
         ('Photo', 'Photo'),
         ('Art', 'Art'),
-        ('Text', 'Text'),
+        ('Text','Text'),
+        ('Box','Box'),
         ('CaseStudy', 'CaseStudy'),
         ('Combo', 'Combo'),
         ('Fig', 'Screenshot'),
-        ('Table', 'Table'),
+        ('Table', 'Table',),
     ]
     unit = models.ForeignKey(Unit, null=True, related_name='elements', on_delete=models.CASCADE)
     contact = models.ForeignKey(Contact, null=True, related_name='contacts', on_delete=models.CASCADE)
@@ -152,6 +153,7 @@ class Element(models.Model):
     # rh_email = models.CharField(max_length=200, null=True)
     # alt_email = models.EmailField(null=True, blank=True)
     rh_address = models.TextField(max_length=300, null=True, blank=True)
+    text_data = models.TextField( null=True, blank=True)
     # phone = models.CharField(max_length=20, null=True, blank=True)
     # fax = models.CharField(max_length=20, null=True, blank=True)
     insert_1 = models.CharField(max_length=200, null=True, blank=True)
@@ -236,7 +238,9 @@ class Element(models.Model):
         elif self.element_type == 'CaseStudy':
             shortform = 'FTR'
         elif self.element_type == 'Text':
-            shortform = 'FTR'
+            shortform = 'TXT'
+        elif self.element_type == 'Box':
+            shortform = 'BOX'
         elif self.element_type == 'Combo':
             shortform = 'FIG'
         elif self.element_type == 'Cover':

@@ -83,7 +83,13 @@
         {% if ems == e.pk %}
             <div style="page-break-inside: avoid">
             <p><b>{{e.unit.book.isbn}}_CH{{e.unit.chapter_number}}_{{e.shortform}}{{e.element_number}}</b></p>
-            <p><img src="../media/documents/{{e.unit.book.isbn}}/resized/{{e.unit.book.isbn}}_CH{{e.unit.chapter_number}}_{{e.shortform}}{{e.element_number}}.png"/></p>
+            {% if e.text_data == None %}              
+              <p><img src="../media/documents/{{e.unit.book.isbn}}/resized/{{e.unit.book.isbn}}_CH{{e.unit.chapter_number}}_{{e.shortform}}{{e.element_number}}.png"/></p>
+              
+              {% else %}
+              <p><b> Text:</b> {{e.text_data}}</p>
+              {% endif %}
+            
             </div>
         {% endif %}
     {% endfor %}    

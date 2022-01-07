@@ -66,7 +66,12 @@
 
             <div style="page-break-inside: avoid">
             <p><b>{{element.unit.book.isbn}}_CH{{element.unit.chapter_number}}_{{element.shortform}}{{element.element_number}}</b></p>
+            {% if element.text_data == None %}              
             <p><img src="../media/documents/{{element.unit.book.isbn}}/resized/{{element.unit.book.isbn}}_CH{{element.unit.chapter_number}}_{{element.shortform}}{{element.element_number}}.png"/></p>
+              {% else %}
+              <p><b> Text:</b> {{element.text_data}}</p>
+              {% endif %}
+            
             </div>
 
 </body>

@@ -31,7 +31,13 @@
         <td valign="top"><b>Element Number:</b> {{e.element_number}}<br/>
             <b> Chapter Number:</b> {{e.unit.chapter_number}}<br/>
             <b> Caption:</b> {{e.caption}}</td>
-            <td style="width:30%"><img width="200" src="/media/documents/{{e.unit.book.isbn}}/resized/{{e.unit.book.isbn}}_CH{{e.unit.chapter_number}}_{{e.shortform}}{{e.element_number}}.png"/></td></tr>
+            {% if e.text_data == None %}              
+              <td style="width:30%"><img width="200" src="/media/documents/{{e.unit.book.isbn}}/resized/{{e.unit.book.isbn}}_CH{{e.unit.chapter_number}}_{{e.shortform}}{{e.element_number}}.png"/></td></tr>
+              
+              {% else %}
+              <td style="width:30%"><b> Text:</b> {{e.text_data}}</td></tr>
+              {% endif %}
+            
             <tr><td></td><td colspan="4" valign="middle"><b>{% if e.get_followup_count > 0%}First {% endif %} Permission requested: </b> {{e.requested_on|timesince}} ago 
              <button type="button" id="myBtnTFE{{forloop.counter}}" class="btn btn-secondary btn-sm" data-toggle="modal"  data-target="#myModalTFE{{forloop.counter}}">TEST</button>
                 <div class="modal fade"  id="myModalTFE{{forloop.counter}}" tabindex="-1" role="dialog">
