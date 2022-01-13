@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ book.title }} - {{block.super}}
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' book.pk%}">{{ book.title }}</a></li>
+  <li class="breadcrumb-item active">Image Process</li>
+{% endblock %}
+
+{% block content %}
+{{result}}
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ book.title }} - {{block.super}}
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' book.pk%}">{{ book.title }}</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'unit_list' book.pk%}">Permission</a></li>
+  <li class="breadcrumb-item active">Test agreement</li>
+{% endblock %}
+
+{% block content %}
+{%  if internet_socket %}
+  {% if status %}
+
+    <div class="alert alert-success" role="alert">
+    Test agreement successfully sent to {{user.email}}
+    </div>
+  {% else %}
+    <div class="alert alert-warning" role="alert">
+    Please check your Password!
+    </div>
+  {% endif %}
+{% else %}
+  <div class="alert alert-warning" role="alert">
+  Please check your Internert Connection!
+  </div>   
+{{result}}
+{% endif %}
+{% endblock %}

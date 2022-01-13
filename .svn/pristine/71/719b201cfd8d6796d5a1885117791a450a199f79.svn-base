@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ book.title }} - {{block.super}}
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' book.pk%}">{{ book.title }}</a></li>
+  <li class="breadcrumb-item">No images</li>
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+    <a href="{% url 'new_unit' book.pk %}" class="btn btn-primary btn-sm">NEW UNIT</a>
+    <a href="{% url 'process_data' book.pk %}" class="btn btn-primary btn-sm">IMPORT DATA</a>
+    <a href="{% url 'process_images' book.pk %}" class="btn btn-primary btn-sm">PROCESS IMAGES</a>
+    <a href="{% url 'unit_list' book.pk %}" class="btn btn-primary btn-sm">PERMISSION</a>
+    <!-- <a href="{% url 'import_units' book.pk%}" class="btn btn-primary btn-sm">IMPORT UNITS</a>
+    <a href="{% url 'export_units' book.pk %}" class="btn btn-primary btn-sm">EXPORT UNIT DETAILS</a> -->
+</div>
+
+<div class="alert alert-warning" role="alert">
+Images not found. No folder with ISBN {{book.isbn}} inside 'documents' folder.
+</div>
+{% endblock %}

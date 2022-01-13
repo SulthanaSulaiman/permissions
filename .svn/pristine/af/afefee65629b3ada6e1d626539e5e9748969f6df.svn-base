@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Search{% endblock %}
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item active">Search</li>
+{% endblock %}
+{% block content %}
+
+    {% if query %}
+    {% if results.count != 0 %}
+        <h1>Books containing "{{ query }}"</h1>
+        <h3>
+            {% with results.count as total_results %}
+                Found {{ total_results }}
+                result{{ total_results|pluralize }}
+            {% endwith %}
+        </h3>
+    {% for book in results %}
+      <h4><a href="{% url 'book_units' book.pk %}">{{ book.title }}</a></h4>
+    {% empty %}
+      <p>There are no results for your query.</p>
+    {% endfor %}
+    {% endif %}
+    {% if contact.count != 0 %}
+     <h1>Contacts containing "{{ query }}"</h1>
+        <h3>
+            {% with contact.count as contact_counts %}
+                Found {{ contact_counts }}
+                result{{ contact_counts|pluralize }}
+            {% endwith %}
+        </h3>
+    {% for c in contact %}
+      <h6><a href="{% url 'edit_contact' c.pk %}">{% if c.rh_firstname %} {{c.rh_firstname}}{% if c.rh_lastname %} {{c.rh_lastname}}{% endif %}{% endif %} ({{c}}{% if c.alt_email%}, Alt: {{c.alt_email}}{% endif %})</a>{% if c.rh_address%}, {{c.rh_address}}{% endif %}{% if c.phone%}, Tel: {{c.phone}}{% endif %}{% if c.fax%}, Fax: {{c.fax}}{% endif %}</h6>
+      {%endfor%}
+    {% endif %}
+    {% if element.count != 0 %}
+     <h1>Elements containing "{{ query }}"</h1>
+        <h3>
+            {% with element.count as element_counts %}
+                Found {{ element_counts }}
+                result{{ element_counts|pluralize }}
+            {% endwith %}
+        </h3>
+    {% for e in element %}
+      <h6><a href="{% url 'edit_element' e.unit.book.pk e.unit.pk e.pk %}">{{e.unit.book.title}}{% if e.unit.book.isbn %} ({{e.unit.book.isbn}}){% endif %}, Chapter {{ e.unit}}, {{ e}}</a> {% if e.granted_on %}, Granted on: {{e.granted_on}} {% elif e.denied_on %}, Denied on: {{e.denied_on}} {% elif e.requested_on%}, Requsted on: {{e.requested_on}} {% else %}, Yet to request {% endif %}</h6>
+      {% comment %} <h6>{{ e.unit.book.pk }} {{ e.unit.pk }} {{e.pk}}</h6> {% endcomment %}
+      {%endfor%}
+    {% endif %}
+    {% if  element.count == 0 and contact.count == 0 and results.count == 0%}
+      <h3>No results found.</h3>
+    {% endif %}
+
+    <a href="{% url "book_search" %}" class="btn btn-secondary btn-bg" role="button">SEARCH AGAIN</a>
+  {% else %}
+    <form method="get">
+      {{ form.as_p }}
+      <input type="submit" class="btn btn-secondary btn-bg" value="SEARCH">
+    </form>
+  {% endif %}
+{% endblock %}

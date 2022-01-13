@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block title %}
+  Books List
+{% endblock %}
+
+
+{% block content %}
+
+<table class="table">
+  <thead class="thead-inverse">
+    <tr>
+      <th></th>
+      <th>Title</th>
+      <th>ISBN</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for k,v in context.items %}
+    <tr><td>Staus: {{k}}</td></tr>
+    {% for x in v %}
+        {% for b in book%}
+        {% if x == b.pk %}
+            <tr><td/><td>{{b.title}}</td>
+            <td>{{b.isbn}}</td></tr>
+        {%endif%}
+        {% endfor %}
+    {% endfor %}     
+{% endfor %} 
+</tbody>
+</table>
+{% endblock %}

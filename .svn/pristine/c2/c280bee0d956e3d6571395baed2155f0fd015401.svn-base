@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ book.title }} - {{block.super}}
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' book.pk%}">{{ book.title }}</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'unit_list' book.pk%}">Permission</a></li>
+  <li class="breadcrumb-item active">Email agreement</li>
+{% endblock %}
+
+{% block content %}
+{%  if internet_socket %}
+{%if status%}
+{% if no_images %}
+  <div class="alert alert-warning" role="alert">
+No images in the folder with ISBN.
+</div>
+{% else %}
+<div class="alert alert-success" role="alert">
+Agreement successfully sent to {{e_list}}
+</div>
+{% endif %}
+{%else%}
+<div class="alert alert-warning" role="alert">
+Email not sent. Please check your Password!
+</div>
+{% endif %}
+{% else %}
+<div class="alert alert-warning" role="alert">
+Email not sent. Please check your internet connection!
+</div>
+{% endif %}
+{% endblock %}

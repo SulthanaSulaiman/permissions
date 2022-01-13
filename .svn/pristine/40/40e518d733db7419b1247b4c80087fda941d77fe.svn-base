@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block title %}
+  Elements List
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' pk%}">{{ book.title }}</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'unit_list' pk%}">Permission</a></li>
+  <li class="breadcrumb-item active">Requested</li>
+{% endblock %}
+
+{% block content %}
+
+<h2 class="text-primary">Elements grouped by Source, Credit Line and RH Contact</h2>
+<div class="container-fluid">
+<table class="mb-4">
+<tbody>
+  
+{% for ems_key,ems in context.items %}
+    <tr><td colspan="4"><p class="p-3 mb-2 bg-info text-white"><b>Source:</b> {{ems_key.0}}<br/>
+    <b>Credit Line:</b> {{ems_key.1}}<br/>
+    <b>RH Contact:</b> {{ems_key.2}}</p></td></tr>
+    {% for x in ems %}
+     <tr><td valign="top" style="width:2%"><b>{{forloop.counter}}. </b></td>
+        {% for e in element%}
+        {% if x == e.pk%}
+        <td valign="top"><b>Element Number:</b> {{e.element_number}}<br/>
+            <b> Chapter Number:</b> {{e.unit.chapter_number}}<br/>
+            <b> Caption:</b> {{e.caption}}</td>
+            {% if e.text_data == None %}              
+              <td style="width:30%"><img width="200" src="/media/documents/{{e.unit.book.isbn}}/resized/{{e.unit.book.isbn}}_CH{{e.unit.chapter_number}}_{{e.shortform}}{{e.element_number}}.png"/></td></tr>
+              
+              {% else %}
+              <td style="width:30%"><b> Text:</b> {{e.text_data}}</td></tr>
+              {% endif %}
+            
+            <tr><td></td><td colspan="4" valign="middle"><b>{% if e.get_followup_count > 0%}First {% endif %} Permission requested: </b> {{e.requested_on|timesince}} ago 
+             <button type="button" id="myBtnTFE{{forloop.counter}}" class="btn btn-secondary btn-sm" data-toggle="modal"  data-target="#myModalTFE{{forloop.counter}}">TEST</button>
+                <div class="modal fade"  id="myModalTFE{{forloop.counter}}" tabindex="-1" role="dialog">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabelTFE{{forloop.counter}}">Authentication</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <form method="post" action="{% url 'test_followup_email_agreement_e' e.unit.book.pk e.unit.pk e.pk%}">
+                          {% csrf_token %}
+                          <label for="password">Enter the Password: </label>
+                          <input id="passwordTFE{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
+                          <button type="submit"  class="btn btn-success btn-sm">Send</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <button type="button" id="myBtnSFE{{forloop.counter}}" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#myModalSFE{{forloop.counter}}">FOLLOWUP</button>
+                <div class="modal fade"  id="myModalSFE{{forloop.counter}}" tabindex="-1" role="dialog">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabelSFE{{forloop.counter}}">Authentication</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <form method="post" action="{% url 'followup_email_agreement_e' e.unit.book.pk e.unit.pk e.pk%}">
+                          {% csrf_token %}
+                          <label for="password">Enter the Password: </label>
+                          <input id="passwordSFE{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
+                          <button type="submit"  class="btn btn-success btn-sm">Send</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              
+             <!--<a href="{% url 'followup_agreement_e' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-primary btn-sm" role="button">FOLLOWUP AGREEMENT</a> <a href="{% url 'followup_email_body_e' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-primary btn-sm" role="button">FOLLOWUP EMAIL</a>--> 
+            <a href="{% url 'update_granted_e' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-success btn-sm" role="button">GRANTED</a> <a href="{% url 'update_status_denied' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-danger btn-sm" role="button">DENIED</a><br/>
+            <b>Number of followups:</b> {{e.get_followup_count}}{% if e.get_followup_count > 0%} ({{e.get_followup_dates|join:", "}}) {% endif %}
+            {% comment %} ({% for f in e.get_followup_dates %}
+              {{f|join:" // "}}
+            {% endfor %}) {% endcomment %}
+            </td></tr>
+        {% endif %}
+        {% endfor %}
+    {% endfor %}
+    <tr><td></td><td colspan="4">
+    {% comment %} <a href="{% url 'update_followups' pk ems%}"
+       class="btn btn-primary btn-sm"
+       role="button">FOLLOWUP OLD</a> {% endcomment %}
+      
+       <button type="button" id="myBtnTF{{forloop.counter}}" class="btn btn-secondary btn-sm" data-toggle="modal"  data-target="#myModalTF{{forloop.counter}}">TEST</button>
+          <div class="modal fade"  id="myModalTF{{forloop.counter}}" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabelTF{{forloop.counter}}">Authentication</h5>
+                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                  <form method="post" action="{% url 'test_followup_email_agreement' pk ems%}">
+                  {% csrf_token %}
+                  <label for="password">Enter the Password: </label>
+                  <input id="passwordTF{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
+                  <button type="submit"  class="btn btn-success btn-sm">Send</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        <button type="button" id="myBtnSF{{forloop.counter}}" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModalSF{{forloop.counter}}">FOLLOWUP</button>
+          <div class="modal fade" id="myModalSF{{forloop.counter}}" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabelSF{{forloop.counter}}">Authentication</h5>
+                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                  <form method="post" action="{% url 'followup_email_agreement' pk ems%}">
+                  {% csrf_token %}
+                  <label for="password">Enter the Password: </label>
+                  <input id="passwordSF{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
+                  <button type="submit"  class="btn btn-success btn-sm">Send</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+       
+       <a href="{% url 'update_granted' pk ems%}"
+       class="btn btn-success btn-sm"
+       role="button">GRANTED</a></td></tr>  
+{% endfor %} 
+</tbody>
+</table>
+</div>
+{% endblock %}

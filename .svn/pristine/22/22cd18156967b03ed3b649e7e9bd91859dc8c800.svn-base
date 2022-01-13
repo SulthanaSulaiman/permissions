@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block title %}
+  Denied List
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' pk%}">{{ book.title }}</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'unit_list' pk%}">Permission</a></li>
+  <li class="breadcrumb-item active">Denied</li>
+{% endblock %}
+
+{% block content %}
+
+<h2 class="text-primary">Elements grouped by Source, Credit Line and RH Contact</h2>
+<div class="container-fluid">
+<table class="table mb-4">
+<tbody>
+
+  
+{% for ems_key,ems in context.items %}
+    <tr><td colspan="4"><p class="p-3 mb-2 bg-info text-white"><b>Source:</b> {{ems_key.0}}<br/>
+    <b>Credit Line:</b> {{ems_key.1}}<br/>
+    <b>RH Contact:</b> {{ems_key.2}}</p></td></tr>
+    {% for x in ems %}
+    <tr><td valign="top" style="width:2%"><b>{{forloop.counter}}. </b></td>
+        {% for e in element%}
+        {% if x == e.pk%}
+        <td valign="top"><b>Element Number:</b> {{e.element_number}}<br/>
+            <b> Chapter Number:</b> {{e.unit.chapter_number}}<br/>
+            <b> Caption:</b> {{e.caption}}<br/>
+            <b> Permission </b> denied {{e.denied_on|timesince}} ago <a href="{% url 'update_status_restore' e.unit.book.pk e.unit.pk e.pk%}" class="btn btn-success btn-sm" role="button">RESTORE</a></td>
+            {% if e.text_data == None %}              
+              <td style="width:30%"><img width="200" src="/media/documents/{{e.unit.book.isbn}}/resized/{{e.unit.book.isbn}}_CH{{e.unit.chapter_number}}_{{e.shortform}}{{e.element_number}}.png"/></td></tr>
+              
+              {% else %}
+              <td style="width:30%"><b> Text:</b> {{e.text_data}}</td></tr>
+              {% endif %}
+            
+        {%endif%}
+        {% endfor %}
+    {% endfor %}
+   </td></tr>  
+{% endfor %} 
+</tbody>
+</table>
+</div>
+{% endblock %}

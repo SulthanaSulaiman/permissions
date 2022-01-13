@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<title>Permission</title>
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+</head>
+{% block content %}
+<body>
+<p>Dear Permission Manager,</p>
+<p>Greetings from S4Carlisle,</p>
+<p>Hope you are doing well!</p>
+<p>A gentle reminder on our below request, please could you review and let us know your approval status.</p>
+<p>Kindly note that this is the title with the short TAT, so any prompt response would be greatly appreciated.</p>
+<p>Looking forward to hear from you!</p>
+
+<p>Regards,<br/>
+{{user.first_name}}.<br/>
+<p>-----Original Request--------</p>
+<p>I am {{user.first_name}}, Permission Specialist writing on behalf of my client Jones & Bartlett Learning, a textbook publishing company. </p>
+{% comment %} <p>This is a followup email for the permission request we sent for the following elements on the dates listed below:</p>
+
+{% load humanize %}
+
+    <table class="table table-bordered">
+    <thead>
+     <th>Element Number</th><th>Date(s)</th>
+    </thead>
+    <tbody>
+
+{% for ems in ems_list %}
+    {% for e in element%}
+        {% if ems == e.pk %}
+                {% if e.get_followup_count > 0%}
+                <tr><td>{{e.element_number}}</td><td>Requested on: {{e.requested_on|date:"d M Y"}}, Followed up on: {{e.get_followup_date|join:", "}}</td>
+                {% else %}
+                <tr><td>{{e.element_number}}</td><td>Requested on: {{e.requested_on|date:"d M Y"}}</td>
+                {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+    </tbody>
+    </table>
+
+<p><b>Here is the copy of the original email:</b></p> {% endcomment %}
+
+<p>I am currently working on </p>
+<p>{% with element.all|first as e %}
+  <b>{{ e.title }}</b>
+{% endwith %}</p>
+<p>We would like to obtain permission to use the attached image(s) of for this edition:
+{% spaceless %}
+<ol>    
+{% for ems in ems_list %}
+    {% for e in element%}
+        {% if ems == e.pk %}
+                <li>
+                    <p>{{e.caption}}</p>
+                </li>
+        {% endif %}
+    {% endfor %}    
+{% endfor %}
+</ol>
+{% endspaceless %}
+I have attached a copy of the permission request for you, which contains more information of our publication and the rights that we are requesting.</p>
+{% spaceless %}
+<ol>    
+{% for ems in ems_list %}
+    {% for e in element%}
+        {% if ems == e.pk %}
+                <li>
+                    <p><b>JBL ID:</b> {{e.file_name}}<br/>
+                    <b>Caption:</b> {{e.caption}}<br/>
+                    <b>Description:</b> {{e.description}}<br/>
+                    <b>Credit Line:</b> {{e.credit_line}}<br/>
+                    {% if e.source != '' %}<b>Source:</b> {{e.source_link}}{% endif %}</p>
+                </li>
+        {% endif %}
+    {% endfor %}    
+{% endfor %}
+</ol>
+{% endspaceless %}
+<p>I have attached image(s) for your reference. <b>Could you please sign and return a copy of the attached permission letter to my attention via E‐mail along with Hi resolution image(s)?</b> You can find the requested content at the end of the permission letter. Please let know if you have any questions or concerns about the rights that we are requesting.</p>
+<p>Your prompt response would be greatly appreciated!</p>
+<p>Thanks in advance for your help.</p>
+<p>Regards,<br/>
+{{user.first_name}}.<br/>
+
+</body>
+{% endblock %}
+</html>

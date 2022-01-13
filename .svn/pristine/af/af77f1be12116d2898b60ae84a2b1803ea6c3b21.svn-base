@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ element.element_number }} - {{block.super}}
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' book.pk%}">{{book.title}}</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'unit_elements' book.pk unit.pk%}">{{ unit.chapter_number }}</a></li>
+  <li class="breadcrumb-item" active>{{element.element_number}}</li>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+    <a href="{% url 'new_followup' book.pk unit.pk element.pk%}" class="btn btn-primary">NEW FOLLOWUP</a>
+</div>
+
+<table class="table">
+  <thead class="thead-inverse">
+    <tr>
+      <th>Followed Up On</th>
+      <th>Followed Up By</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for followup in element.follow_up.all %}
+      <tr>
+        <td>{{ followup.followedup_at }}</td>
+        <td>{{ followup.followedup_by }}</td>
+        <td><a href="{% url 'edit_followup' book.pk unit.pk element.pk followup.pk%}"
+       class="btn btn-secondary btn-sm" role="button">UPDATE</a></td>
+       <td><a href="{% url 'delete_followup' book.pk unit.pk element.pk followup.pk%}"
+       class="btn btn-danger btn-sm" role="button">DELETE</a></td>
+      </tr>
+    {% endfor %}  
+  </tbody>
+</table>
+
+{% endblock %}

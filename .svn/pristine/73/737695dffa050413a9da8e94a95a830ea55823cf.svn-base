@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% load humanize %}
+
+{% block title %}
+  Elements List
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' pk%}">{{ book.title }}</a></li>
+  <li class="breadcrumb-item active">Permission</li>
+  
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'requested_list' book.pk %}" class="btn btn-primary btn-sm">REQUESTED</a>
+    <a href="{% url 'granted_list' book.pk %}" class="btn btn-primary btn-sm">GRANTED</a>
+    <a href="{% url 'denied_list' book.pk %}" class="btn btn-primary btn-sm">DENIED</a>
+</div>
+
+<h2 class="text-primary">Elements grouped by Source, Credit Line and RH Contact</h1>
+
+<div class="container-fluid">
+<table class="table mb-4">
+<tbody>
+  
+{% for ems_key,ems in context.items %}
+    <tr><td colspan="4"><p class="p-3 mb-2 bg-info text-white"><b>Source:</b> {{ems_key.0}}<br/>
+    <b>Credit Line:</b> {{ems_key.1}}<br/>
+    <b>RH Contact:</b> {{ems_key.2}}</p></td><tr>
+    {% for x in ems %}
+    <tr><td valign="top" style="width:2%"><b>{{forloop.counter}}. </b></td>
+        {% for e in element%}
+        {% if x == e.pk%}
+           {% if e.requested_on == None %}
+              <td style="width:68%"><b>Element Number:</b> {{e.element_number}}<br/>
+              <b> Chapter Number:</b> {{e.unit.chapter_number}}<br/>
+              <b> Caption:</b> {{e.caption}}<br/></td>
+              {% if e.text_data == None %}              
+              <td style="width:30%"><img width="200" src="/media/documents/{{e.unit.book.isbn}}/resized/{{e.unit.book.isbn}}_CH{{e.unit.chapter_number}}_{{e.shortform}}{{e.element_number}}.png"/></td></tr>
+              
+              {% else %}
+              <td style="width:30%"><b> Text:</b> {{e.text_data}}</td></tr>
+              {% endif %}
+           {% endif %}
+        {%endif%}
+        {% endfor %}
+    {% endfor %}
+    <tr><td colspan="4">
+      <a href="{% url 'generate_agreement' pk ems%}"
+       class="btn btn-primary btn-sm"
+       role="button">AGREEMENT</a>  
+       <a href="{% url 'email_body' pk ems%}"
+       class="btn btn-primary btn-sm"
+       role="button">PREVIEW</a>
+   
+      <button type="button" id="myBtnT{{forloop.counter}}" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#myModalT{{forloop.counter}}">TEST</button>
+        <div class="modal fade" id="myModalT{{forloop.counter}}" tabindex="-1" role="dialog" >
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabelT{{forloop.counter}}">Authentication</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                <form method="post" action="{% url 'test_email_agreement' pk ems%}">
+                {% csrf_token %}
+                <label for="password">Enter the Password: </label>
+                <input id="passwordT{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
+                <button type="submit"  class="btn btn-success btn-sm">Send</button>
+
+                </form>
+        
+              </div>
+            </div>
+          </div>
+          </div>
+        
+      <button type="button" id="myBtnS{{forloop.counter}}" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModalS{{forloop.counter}}">SEND</button>
+        <div class="modal fade" id="myModalS{{forloop.counter}}" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabelS{{forloop.counter}}">Authentication</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                <form method="post" action="{% url 'email_agreement' pk ems%}">
+                {% csrf_token %}
+                <label for="password">Enter the Password: </label>
+                <input id="passwordS{{forloop.counter}}" type="password" name="password" class="breadcrumb-item">
+                <button type="submit"  class="btn btn-success btn-sm">Send</button>
+
+                </form>
+        
+              </div>
+            </div>
+          </div>
+          </div>
+       
+       
+
+{% endfor %} 
+      </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,4 @@
+SECRET_KEY='bihmp4cd$#4-*&p00_4!rya^r2@ap-2eptvpq-2=@__e8r(d5l'
+DEBUG=True
+DATABASE_URL='postgres://postgres:BcAZoYWsJbvE7RMgBPzxOCexPRVAq@localhost:5432/postgres'
+ALLOWED_HOSTS=. localhost,127.0.0.1

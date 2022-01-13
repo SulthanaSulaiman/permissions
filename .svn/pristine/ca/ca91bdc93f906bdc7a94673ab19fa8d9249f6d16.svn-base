@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block title %}
+  {{ unit.chapter_title }} - {{block.super}}
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' unit.book.pk%}">{{unit.book.title}}</a></li>
+  <li class="breadcrumb-item" active>{{ unit.chapter_number }}</li>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+    <a href="{% url 'new_element' unit.book.pk unit.pk%}" class="btn btn-primary btn-sm">NEW ELEMENT</a>
+    <!-- <a href="{% url 'import_elements' unit.book.pk unit.pk%}" class="btn btn-primary btn-sm">IMPORT ELEMENTS</a>
+    <a href="{% url 'export_elements' unit.book.pk unit.pk%}" class="btn btn-primary btn-sm">EXPORT ELEMENT DETAILS</a> -->
+</div>
+
+<table class="table table-striped mb-4">
+  <thead class="thead-inverse">
+    <tr>
+      <th>ELEMENT</th>
+      <th>REQUESTED ON</th>
+      <th>GRANTED ON</th>
+      {% comment %} <th>STATUS</th> {% endcomment %}
+      <th>LAST FOLLOWUP</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for element in elements %}
+      <tr>
+        <td class="align-middle">{{ element.element_number }}</td>
+        <td class="align-middle">{{ element.requested_on }}</td>
+        <td class="align-middle">{{ element.granted_on }}</td>
+        {% comment %} <td class="align-middle">{{ element.status }}</td> {% endcomment %}
+        <td class="align-middle"><a href="{% url 'element_followups' unit.book.pk unit.pk element.pk%}">{{ element.get_last_followup|naturalday }}</a></td>
+        <td class="align-middle"><a href="{% url 'edit_element' unit.book.pk unit.pk element.pk%}" class="btn btn-secondary btn-sm" role="button">UPDATE</a></td>
+        {%if group == 'admin'%}<td class="align-middle"><a href="{% url 'delete_element' unit.book.pk unit.pk element.pk%}" class="btn btn-danger btn-sm" role="button">DELETE</a></td>{% endif %}
+      </tr>
+    {% endfor %}  
+  </tbody>
+</table>
+{% include 'includes/pagination.html' %}
+{% endblock %}

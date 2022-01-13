@@ -1,0 +1,50 @@
+{% extends 'base.html' %}{% load static %}
+{% load humanize %}
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item" active>Inactive Books</li>
+{% endblock %}
+
+{% block content %}
+
+        {%if books.count == 0 %}
+             <p>No inactive books on the portal yet!</p>
+        {% else %}
+        <table class="table table-striped mb-4">
+         <thead class="thead-inverse">
+        <tr>
+        <th>BOOK</th>
+        <th>CHAPTERS</th>
+        <th>UNITS</th>
+        <!-- <th>CREATED ON</th> -->
+        <th>REQUESTED</th>
+        <th>GRANTED</th>
+        <!-- <th>EXPORT AS</th> -->
+        </tr>
+        </thead>
+         <tbody>
+        {% for book in books %}
+            <tr>
+                <td>
+                    <a href="{% url 'book_units' book.pk %}">{{ book.title }}</a><br/>
+                    <small class="text-muted d-block">{{ book.isbn }}</small>
+                    <small class="text-muted d-block">{{ book.publisher.publisher_name }}</small>
+                </td>
+                <td class="align-middle">{{book.get_chapters_count}}</td>
+                <td class="align-middle">{{book.get_elements_count}}</td>
+                <!-- <td class="align-middle">{{book.created_at|naturalday}}</td> -->
+                <td class="align-middle">{{book.get_requested_count}}</td>
+                <td class="align-middle">{{book.get_granted_count}}</td>
+                <!-- <td class="align-middle"><a href="{% url 'export_book' book.pk %}" class="btn btn-primary btn-sm">XLSX</a></td> -->
+                {% comment %} <td class="align-middle"><a href="{% url 'edit_book' book.pk %}" class="btn btn-primary btn-sm" role="button">UPDATE</a></td>{% endcomment %}
+                <td class="align-middle"><a href="{% url 'activate_book' book.pk %}" class="btn btn-success btn-sm" role="button">ACTIVATE</a></td> 
+            </tr>
+        {% endfor %}
+           </tbody>
+        </table>
+        {% endif %}
+ 
+
+{% include 'includes/pagination.html' %}
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ book.title }} - {{block.super}}
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' book.pk%}">{{ book.title }}</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'unit_list' book.pk%}">Permission</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'requested_list' book.pk%}">Requested</a></li>
+  <li class="breadcrumb-item active">Granted</li>
+{% endblock %}
+
+{% block content %}
+Permission granted for following elements:
+{% for ems in ems_list %}
+    {% for e in element%}
+        {% if ems == e.pk %}
+                    <p><b>JBL ID:</b> {{e.file_name}} ({{e.element_type}})<br/>
+                    <b>Description:</b> {{e.caption}}<br/>
+                    <b>Credit:</b> {{e.credit_line}}</p>
+        {% endif %}
+    {% endfor %}    
+{% endfor %}
+{% endblock %}

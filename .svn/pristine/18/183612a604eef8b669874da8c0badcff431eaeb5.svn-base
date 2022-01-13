@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ book.title }} - {{block.super}}
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' book.pk%}">{{ book.title }}</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'unit_list' book.pk%}">Permission</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'requested_list' book.pk%}">Requested</a></li>
+  <li class="breadcrumb-item active">Denied</li>
+{% endblock %}
+
+{% block content %}
+Permission denied for following element:
+<p><b>JBL ID:</b> {{element.file_name}} ({{element.element_type}})<br/>
+<b>Description:</b> {{element.caption}}<br/>
+<b>Credit:</b> {{element.credit_line}}</p>
+{% endblock %}

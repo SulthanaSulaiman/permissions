@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit followup{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home'%}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' followups.element.unit.book.pk%}">{{followups.element.unit.book.title}}</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'unit_elements' followups.element.unit.book.pk followups.element.unit.pk%}">{{ followups.element.unit.chapter_number }}</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'element_followups' followups.element.unit.book.pk followups.element.unit.pk followups.element.pk%}">{{ followups.element.element_number }}</a></li>
+  <li class="breadcrumb-item" active>Edit Followup</li>
+{% endblock %}
+
+{% block content %}
+  <form method="post" class="mb-4" novalidate>
+    {% csrf_token %}
+    {% include 'includes/form.html' %}
+    <button type="submit" class="btn btn-success">Save changes</button>
+    <a href="{% url 'element_followups' followups.element.unit.book.pk followups.element.unit.pk followups.element.pk%}"  class="btn btn-outline-secondary" role="button">Cancel<a>
+  </form>
+{% endblock %}

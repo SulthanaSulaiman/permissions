@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% load widget_tweaks %}
+
+{% block title %}Create a New Followup{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home' %}">Books</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'book_units' book.pk %}">{{ book.title }}</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'unit_elements' book.pk unit.pk%}">{{ unit.chapter_number }}</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'element_followups' book.pk unit.pk element.pk%}">{{ element.element_number }}</a></li>
+  <li class="breadcrumb-item active">New Followup</li>
+{% endblock %}
+
+{% block content %}
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  
+  {% include 'includes/form.html' %}
+
+  <button type="submit" class="btn btn-success">ADD</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<title>Permission</title>
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+</head>
+{% block content %}
+<body>
+<p>Dear Permission Manager,</p>
+<p>Greetings from S4Carlisle,</p>
+<p>Hope you are doing well!</p>
+<p>A gentle reminder on our below request, please could you review and let us know your approval status.</p>
+<p>Kindly note that this is the title with the short TAT, so any prompt response would be greatly appreciated.</p>
+<p>Looking forward to hear from you!</p>
+
+<p>Regards,<br/>
+{{user.first_name}}.<br/>
+<p>-----Original Request--------</p>
+
+ <p>I am {{user.first_name}}, Permission Specialist writing on behalf of my client Jones & Bartlett Learning, a textbook publishing company. </p>
+{% comment %} <p>This is a followup email for the permission request we sent for the following elements on the dates listed below:</p>
+
+{% load humanize %}
+
+    {% if element.get_followup_count > 0%}
+    <table class="table table-bordered">
+    <thead>
+     <th>Element Number</th><th>Followed Up Date(s)</th>
+    </thead>
+    <tbody>
+    <tr><td>{{element.element_number}}</td><td>Requested on: {{element.requested_on|date:"d M Y"}}, Followed up on: {{element.get_followup_date|join:", "}}</td>
+    </tbody>
+    </table>
+    {% else %}
+    <table class="table table-bordered">
+    <thead>
+     <th>Element Number</th><th>Permission Requsted Date</th>
+    </thead>
+    <tbody>
+    <tr><td>{{element.element_number}}</td><td>{{element.requested_on|date:"d M Y"}}}</td>
+    </tbody>
+    </table>
+    {% endif %}
+<p><b>Here is the copy of the original email:</b></p> {% endcomment %}
+
+<p>I am currently working on </p>
+<p><b>{{ element.title }}</b></p>
+<p>We would like to obtain permission to use the attached image(s) of for this edition:
+<p>{{element.caption}}</p>
+I have attached a copy of the permission request for you, which contains more information of our publication and the rights that we are requesting.</p>
+                    <p><b>JBL ID:</b> {{element.file_name}}<br/>
+                    <b>Caption:</b> {{element.caption}}<br/>
+                    <b>Description:</b> {{element.description}}<br/>
+                    <b>Credit Line:</b> {{element.credit_line}}<br/>
+                    {% if element.source != '' %}<b>Source:</b> {{element.source_link}}{% endif %}</p>
+<p>I have attached image(s) for your reference. <b>Could you please sign and return a copy of the attached permission letter to my attention via E‐mail along with Hi resolution image(s)?</b> You can find the requested content at the end of the permission letter. Please let know if you have any questions or concerns about the rights that we are requesting.</p>
+<p>Your prompt response would be greatly appreciated!</p>
+<p>Thanks in advance for your help.</p>
+<p>Regards,<br/>
+{{user.first_name}}.<br/>
+
+</body>
+{% endblock %}
+</html>
