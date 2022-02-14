@@ -31,7 +31,14 @@ def import_data(isbn, data):
     for i,y in enumerate(data['RH Contact']):
         if pd.isnull(y)==True:
             return("One of the contacts is empty!")
+        #contact_list=[]
+        #contact_list=data['RH Contact'][i].split(',')
+        #for c in contact_list:
+            
+        #contact = Contact.objects.filter(rh_email =c ).first()
+        
         #contact = Contact.objects.filter(rh_email = data['RH Contact'][i]).first()
+        #print("-----------------------contact-----------------------------",contact)
         #if contact==None:
         #    return("Contact {} does not exist in the contact's database.".format(data['RH Contact'][i]))
     
@@ -68,18 +75,23 @@ def import_data(isbn, data):
                 element.credit_line = data['Credit Line'][i] if 'Credit Line' in data else ''
                 element.source_link = data['Source Link'][i] if 'Source Link' in data else ''
                 element.title = data['Title with author'][i] if 'Title with author' in data else ''
+                
+                element.rh_name = data['RH Name'][i] if 'RH Name' in data else ''
                 element.rh_email = data['RH Contact'][i] if 'RH Contact' in data else ''
+                element.rh_address = data['RH Address'][i] if 'RH Address' in data else ''
+
                 #contact = Contact.objects.filter(rh_email = data['RH Contact'][i]).first()
                 #element.contact_id = contact.pk
                 # element.rh_email = data['RH e-mail'][i]
                 # element.alt_email = data['Alt - e-mail'][i]
-                element.rh_address = data['RH Address'][i] if 'RH Contact' in data else ''
+                #element.rh_address = data['RH Address'][i] if 'RH Contact' in data else ''
                 element.text_data = data['Data for Text'][i] if 'Data for Text' in data else ''
                 # element.phone = data['Phone'][i]
                 # element.fax = data['Fax'][i]
                 element.insert_1 = data['Insert 1'][i] if 'Insert 1' in data else ''
                 #element.rs_name = data['RS Name'][i] if 'RS Name' in data else ''
-                element.jbl_rh_name = data['RS Name'][i] if 'RS Name' in data else ''
+                #element.jbl_rh_name = data['RS Name'][i] if 'RS Name' in data else ''
+                element.rs_name = data['RS Name'][i] if 'RS Name' in data else ''
                 element.file_location = data['File Location'][i]  if 'File Location' in data else ''
                 element.file_name = data['File name'][i] if 'File name' in data else ''
                 element.active = True
@@ -98,7 +110,12 @@ def import_data(isbn, data):
                     element.credit_line = data['Credit Line'][i] if 'Credit Line' in data else ''
                     element.source_link = data['Source Link'][i] if 'Source Link' in data else ''
                     element.title = data['Title with author'][i] if 'Title with author' in data else ''
+                    
+                    element.rh_name = data['RH Name'][i] if 'RH Name' in data else ''
                     element.rh_email = data['RH Contact'][i] if 'RH Contact' in data else ''
+                    element.rh_address = data['RH Address'][i] if 'RH Address' in data else ''
+
+                    #element.rh_email = data['RH Contact'][i] if 'RH Contact' in data else ''
                     #contact = Contact.objects.filter(rh_email = data['RH Contact'][i]).first()
                     #element.contact_id = contact.pk
                     # element.rh_email = data['RH e-mail'][i]
@@ -108,7 +125,8 @@ def import_data(isbn, data):
                     # element.fax = data['Fax'][i]
                     element.insert_1 = data['Insert 1'][i] if 'Insert 1' in data else ''
                     #element.rs_name = data['RS Name'][i] if 'RS Name' in data else ''
-                    element.jbl_rh_name = data['RS Name'][i] if 'RS Name' in data else ''
+                    #element.jbl_rh_name = data['RS Name'][i] if 'RS Name' in data else ''
+                    element.rs_name = data['RS Name'][i] if 'RS Name' in data else ''
                     element.file_location = data['File Location'][i]  if 'File Location' in data else ''
                     element.file_name = data['File name'][i] if 'File name' in data else ''
                     element.active = True

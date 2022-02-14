@@ -6,7 +6,48 @@ import math
 
 from permissions.models import Contact
 from pytz import UTC
+from .models import Book, Unit, Contact, Element, FollowUp
+    
+def contacts_from_element():
+    print("\n\ncontacts_from_element is called\n\n")
+    element = Element.objects.all()
+    email_d=(Element.objects.values('rh_email'))
 
+    rh_emaillist1=[]
+    for email1 in email_d:
+      
+        rh_email=email1['rh_email']
+        rh_emaillist1.append(rh_email)
+  
+    rh_emailSet1=set()
+    for i in rh_emaillist1:
+        if ',' in i:
+            l=[]
+            l=i.split(',')
+            for j in l:
+                rh_emailSet1.add(j)
+        else:
+            rh_emailSet1.add(i)
+
+    email_contact=(Contact.objects.values('rh_email'))
+
+    rh_emailSet2=set()
+    
+    for email2 in email_contact:
+        rh_email1=email2['rh_email']
+        rh_emailSet2.add(rh_email1)
+
+    rh_emailSet=rh_emailSet1-rh_emailSet2
+    rh_emailList=list(rh_emailSet)
+    print("rh_emailList")
+    print(rh_emailList)
+    if len(rh_emailList)!=0:
+        for email in rh_emailList:
+            contact=Contact()
+            contact.rh_email=email
+            contact.save()
+            #print("test")
+    
 def import_contacts(data):
     already_exists = []
     new_contacts = []

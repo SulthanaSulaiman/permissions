@@ -100,7 +100,7 @@ class Unit(models.Model):
 class Contact(models.Model):
     rh_firstname = models.CharField(max_length=100, null=True)
     rh_lastname = models.CharField(max_length=100, null=True)
-    rh_email = models.CharField(max_length=100, unique=True, null=True)
+    rh_email = models.TextField( unique=True, null=True)
     alt_email = models.EmailField(null=True, blank=True)
     rh_address = models.TextField(max_length=300, null=True, blank=True)
     phone = models.CharField(max_length=30, null=True, blank=True)
@@ -147,17 +147,23 @@ class Element(models.Model):
     source = models.CharField(max_length=200, null=True, blank=True)
     credit_line = models.TextField(max_length=300, null=True, blank=True)
     # status = models.CharField(max_length=25, choices=STATUS_CHOICES, blank=True)
+
     source_link = models.CharField(max_length=300, null=True, blank=True)
+    rh_name = models.CharField(max_length=300, null=True, blank=True)
     rh_email = models.CharField(max_length=300, null=True, blank=True)
+    rh_address = models.TextField(max_length=300, null=True, blank=True)
+
     title = models.CharField(max_length=200, null=True, blank=True)
     # rh_email = models.CharField(max_length=200, null=True)
     # alt_email = models.EmailField(null=True, blank=True)
-    rh_address = models.TextField(max_length=300, null=True, blank=True)
+    
     text_data = models.TextField( null=True, blank=True)
     # phone = models.CharField(max_length=20, null=True, blank=True)
     # fax = models.CharField(max_length=20, null=True, blank=True)
     insert_1 = models.CharField(max_length=200, null=True, blank=True)
-    jbl_rh_name = models.CharField(max_length=75, null=True, blank=True)
+    #jbl_rh_name = models.CharField(max_length=75, null=True, blank=True)
+    rs_name = models.CharField(max_length=75, null=True, blank=True)
+    
     file_location = models.CharField(max_length=200, null=True, blank=True)
     file_name = models.CharField(max_length=80, null=True, blank=True)
     requested_on = models.DateTimeField(null=True, blank=True)

@@ -13,6 +13,7 @@ class Migration(migrations.Migration):
         migrations.RenameField(
             model_name='element',
             old_name='rs_name',
-            new_name='jbl_rh_name',
+            new_name='rs_name',
         ),
     ]
+

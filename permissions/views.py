@@ -27,6 +27,7 @@ from .image_process import i_process
 from .art_proof import i_proof
 from .load_data import import_data
 from .load_contacts import import_contacts
+from .load_contacts import contacts_from_element
 from csv import DictReader
 import pandas as pd
 import logging
@@ -177,6 +178,7 @@ class NewContactView(CreateView):
 
 @method_decorator(login_required, name='dispatch')
 class BookListView(ListView):
+    #contacts_from_element()
     model = Book
     context_object_name = 'books'
     paginate_by = 8
@@ -209,7 +211,9 @@ class BookListInactiveView(ListView):
 
 @method_decorator(login_required, name='dispatch')
 class ContactListView(ListView):
+    contacts_from_element()
     model = Contact
+    
     context_object_name = 'contacts'
     paginate_by = 8
     template_name = 'contacts.html'
@@ -248,7 +252,9 @@ def activate_contact(request, pk):
     user = request.user.username
     logger.info("Contact {} activated by {} at {}.".format(contact.rh_email, user, timezone.now()))
     return redirect('contact_inactive')
-
+def refresh_contact(request):
+     contacts_from_element()
+     return redirect('contacts')
 class ContactListInactiveView(ListView):
     model = Contact
     context_object_name = 'contacts'
@@ -377,7 +383,8 @@ def new_element(request, pk, pk1):
             # element.phone = form.cleaned_data.get('phone')
             # element.fax = form.cleaned_data.get('fax')
             element.insert_1 = form.cleaned_data.get('insert_1')
-            element.jbl_rh_name = form.cleaned_data.get('jbl_rh_name')
+            #element.jbl_rh_name = form.cleaned_data.get('jbl_rh_name')
+            element.rs_name = form.cleaned_data.get('rs_name')
             element.file_location = form.cleaned_data.get('file_location')
             element.file_name = form.cleaned_data.get('file_name')
             element.file_location = form.cleaned_data.get('file_location')
@@ -511,15 +518,18 @@ class ElementUpdateView(UpdateView):
     model = Element
     # fields = '__all__'
     # fields = ('unit', 'element_number', 'caption', 'element_type', 'source', 'credit_line', 'source_link', 'title', 'rh_email', 'alt_email', 'rh_address', 'phone', 'fax', 'insert_1', 'jbl_rh_name', 'requested_on', 'granted_on', 'permission_status', 'denied_on')
-    fields = ('unit', 'element_number', 'caption', 'element_type', 'source', 'credit_line', 'source_link', 'title', 'contact', 'insert_1', 'jbl_rh_name', 'requested_on', 'granted_on', 'permission_status', 'denied_on')
+    # fields = ('unit', 'element_number', 'caption', 'element_type', 'source', 'credit_line', 'source_link', 'title', 'contact', 'insert_1', 'jbl_rh_name', 'requested_on', 'granted_on', 'permission_status', 'denied_on')
+    fields = ('unit', 'element_number', 'caption', 'element_type', 'source', 'credit_line', 'source_link', 'title','rh_name','rh_email','rh_address','insert_1', 'rs_name', 'requested_on', 'granted_on', 'permission_status', 'denied_on')
     template_name = 'edit_element.html'
     pk_url_kwarg = 'element_pk'
     context_object_name = 'element_e'
 
     def form_valid(self, form):
         element_e = form.save(commit=False)
+        
         element_e.updated_by = self.request.user
         element_e.save()
+        
         logger.info("ISBN: {}, chapter {}, element {} updated by {} at {}.".format(element_e.unit.book.isbn, element_e.unit.chapter_number, element_e.element_number, element_e.updated_by, timezone.now()))
         return redirect('unit_elements', pk=element_e.unit.book.pk, pk1=element_e.unit.pk)
     
@@ -805,7 +815,8 @@ def email_agreement(request, pk, ems):
                 email_rh = e.rh_email
                 source = e.source
                 imag_calc_name=e.imag_calc_name
-                rs_name=e.jbl_rh_name
+                #rs_name=e.jbl_rh_name
+                rs_name=e.rs_name
                 ems_element_type.append(e.element_type)
                 rh_address=e.rh_address  
                 
@@ -959,8 +970,8 @@ def test_email_agreement_old(request, pk, ems):
             if ems==e.pk:
                 source = e.source
                 imag_calc_name=e.imag_calc_name
-                rs_name=e.jbl_rh_name
-
+                #rs_name=e.jbl_rh_name
+                rs_name=e.rs_name
                 ems_element_type.append(e.element_type)
     #if source=='':
     #    return redirect('unit_list', pk=book.pk)
@@ -1025,7 +1036,8 @@ def test_email_agreement(request, pk, ems):
             if ems==e.pk:
                 source = e.source
                 imag_calc_name=e.imag_calc_name
-                rs_name=e.jbl_rh_name    
+                #rs_name=e.jbl_rh_name  
+                rs_name=e.rs_name  
                 ems_element_type.append(e.element_type)
                 rh_address=e.rh_address  
                 
@@ -1165,7 +1177,8 @@ def email_body(request, pk, ems):
     for ems in ems_list:
         for e in element:
             if ems==e.pk:
-                rs_name = e.jbl_rh_name
+                #rs_name = e.jbl_rh_name
+                rs_name = e.rs_name
                 title=e.title
                 ems_element_type.append(e.element_type)
     return render(request, 'emailbody.html', {'ems_list': ems_list, 'element': element, 'user': user_data, 'ems_element_type': ems_element_type,'rs_name':rs_name})
@@ -1288,7 +1301,8 @@ def followup_email_body(request, pk, ems):
     for ems in ems_list:
         for e in element:
             if ems==e.pk:
-                rs_name = e.jbl_rh_name
+                #rs_name = e.jbl_rh_name
+                rs_name=e.rs_name
                 dates[e.element_number].append(e.follow_up.all().order_by('followedup_at'))
                 #dates=e.follow_up.all()
     dates.default_factory = None
@@ -1414,7 +1428,7 @@ def followup_email_agreement(request, pk, ems):
     subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name, source)
     
     body = render_to_string("emailbody_followup.html", {'ems_list': ems_list, 'element': element, 'user': user_data,'dates': dates,'rs_name':rs_name})
-    #message = render_to_string("emailbody_followup.html", {'ems_list': ems_list, 'element': element, 'user': user_data, 'dates': dates,'rs_name':jbl_rh_name})
+    #message = render_to_string("emailbody_followup.html", {'ems_list': ems_list, 'element': element, 'user': user_data, 'dates': dates,'rs_name':rs_name})
 
     #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', e_list)
     #email = EmailMessage(subject, message, 'S4CPermissions@s4carlisle.com', e_list,reply_to=[request.user.email],cc=['s4permission@gmail.com'])
@@ -1609,7 +1623,8 @@ def test_followup_email_agreement(request, pk, ems):
             if ems==e.pk:
                 source = e.source
                 imag_calc_name=e.imag_calc_name
-                rs_name=e.jbl_rh_name
+                #rs_name=e.jbl_rh_name
+                rs_name=e.rs_name
                 ems_element_type.append(e.element_type)
                 rh_address=e.rh_address  
                 
@@ -1820,7 +1835,7 @@ def followup_email_agreement_e(request, pk, pk1, pk2):
 
     imag_calc_name=element.imag_calc_name
     source=element.source   
-    rs_name=element.jbl_rh_name
+    rs_name=element.rs_name
     
     subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
     source1 = source.replace(" ", "_")
@@ -1995,7 +2010,7 @@ def test_followup_email_agreement_e(request, pk, pk1, pk2):
 
     imag_calc_name=element.imag_calc_name
     source=element.source   
-    rs_name=element.jbl_rh_name
+    rs_name=element.rs_name
     
     subject = "Jones & Bartlett Permission Request_{}_{}".format(imag_calc_name,source)
     source1 = source.replace(" ", "_")
@@ -2164,7 +2179,7 @@ def book_search(request):
         if form.is_valid():
             query = form.cleaned_data['query']
             results = Book.activated.annotate(search=SearchVector('title','isbn'),).filter(search=query)
-            results_element = Element.objects.annotate(search=SearchVector('contact__rh_email', 'contact__alt_email', 'contact__rh_firstname', 'contact__rh_lastname', 'element_type', 'title', 'jbl_rh_name', 'source', 'insert_1', 'credit_line', 'caption', 'element_number')).filter(search=query)
+            results_element = Element.objects.annotate(search=SearchVector('contact__rh_email', 'contact__alt_email', 'contact__rh_firstname', 'contact__rh_lastname', 'element_type', 'title', 'rs_name', 'source', 'insert_1', 'credit_line', 'caption', 'element_number')).filter(search=query)
             results_contact = Contact.objects.annotate(search=SearchVector('rh_email', 'alt_email', 'rh_firstname', 'rh_lastname', 'rh_address')).filter(search=query)
             # results_contact = Element.objects.filter(contact__rh_email=query)
             # results_contact = Element.objects.filter(search=SearchVector('element_number'),).filter(search=query)
