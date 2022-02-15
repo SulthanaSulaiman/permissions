@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<title>Permission</title>
+<style>
+@page {
+  size: a4 portrait;
+  margin: 80mm 20mm 20mm 20mm;
+  @top-left{
+    content: url({{element.unit.book.publisher.publisher_logo.url}});
+  };
+  @bottom-right{
+    content: "{{element.unit.book.publisher.publisher_imprint}}";
+  }
+}
+</style>
+
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    {% block stylesheet %}{% endblock %}
+</head>
+{% block content %}
+<body>
+<p></b> <span style="float:right;"><b>Date: {% now "m/d/Y" %}</b><p></span><br/>
+<p style="text-align:left;">
+{% for a in address%}
+  {% if forloop.last%}
+<b>{{a}}.</b><br>
+{% else %}
+  <b>{{a}},</b><br>
+{%endif%}
+{% endfor%}
+</p>
+<p><b>Dear Permission Manager,</b></p>
+<p>Ascend Learning, LLC (together with Ascend Affiliates, including, without limitation, Jones & Bartlett Learning, LLC, (collectively referred to herein as “Ascend Learning”) is currently preparing the educational product listed below (“Ascend Learning Material”). For purposes hereof, “Ascend Affiliates” shall include all companies controlled by, or under common control of, Ascend Learning, LLC.</p>
+<p>
+  <b>{{ element.insert_1 }}</b>
+</p>
+<p>We would like to request permission by this letter of agreement (“Agreement”) to use the following material, to which you hold copyright:</p>
+<p>Ascend Learning would like to use the above referenced material (“Material”), without charge, royalty-free, in perpetuity, throughout the world in any language, in the Ascend Learning Material and all related ancillary material of this educational textbook and in related in-context marketing and promotional materials (facsimiles [including without limitation screen shots] of complete student edition and/or teacher edition pages), in print and electronic or digital formats, including without limitation audio versions (including podcasts), customizations and derivative works, CD-ROMs, DVDs and other portable electronic devices, websites, image banks, learning management systems developed by Ascend Learning , and other technologies, whether now known or developed in the future. In the normal course of marketing the Ascend Learning Material, we may need to make minimal changes or reconfigure in different formats, such as hardcover or softcover; single volumes or modular versions; abridged editions; editions composed of selected unchanged chapters or unchanged chapters combined with new material; or with a different cover. This may include major revisions (with more than 10% of changes to the art program), minor revisions (with less than 10% changes to the art program), and a general revision as an updated or modified version of this previously existing work. Therefore, we also request the right to include and publish the Material in such versions, revisions, and future editions of the Ascend Learning Material. These rights in no way restrict publication of the Material in any other form by you or others authorized by you.</p>
+<p>If you agree to grant Ascend Learning the rights requested above, please sign this letter, which will serve as the formal agreement between you and Ascend Learning, and return it to my attention. Your signature below will also confirm that you are authorized to grant the rights described in this Agreement and that the Material, if not believed to be in the public domain, is protected by copyright at the time of this Agreement. Please keep a copy of this Agreement, when fully-executed, for your files. If you do not own or control the rights to the Material, please do not sign this Agreement and refer us to the correct rightsholder as soon as possible. If signed by you below, we plan to use the following credit line unless you specify another by writing your change in the space below:</p>
+<p>I would appreciate your consent to this request at your earliest convenience. If you do sign and return this Agreement, any other contrary or conflicting terms you may attach or provide (on an invoice or otherwise) or changes you may make to the rights described above will not apply. If you prefer to use your own license or permission agreement instead, please note that it must include the rights described above. This Agreement is governed by the laws of the Commonwealth of Massachusetts. Thank you.</p>
+<p>Sincerely,</p>
+<p>
+  {{ element.rs_name }},
+  <p>{{element.unit.book.publisher.publisher_name}}.</p>
+<p style="page-break-after: always" ></p>
+
+
+<p><b>CONTENT BEING REQUESTED:</b></p>
+                    <p><b>JBL ID:</b> {{element.file_name}}<br/>
+                    <b>Caption:</b> {{element.caption}}<br/>
+                    <b>Description:</b> {{element.description}}<br/>
+                    <b>Credit Line:</b> {{element.credit_line}}<br/>
+                    {% if element.source_link != '' %}<b>Source:</b> {{element.source_link}}{% endif %}</p>
+<p></p>
+<p>For good and valuable consideration, the receipt and sufficiency of which the parties hereby acknowledge, permission is granted to Ascend Learning for the use of the Material, in accordance with the terms of this Agreement, as requested above.</p>
+<p><b>If acting on behalf of an individual, please complete the following personal information:</b></p>
+<p>Name: _________________________________ Signature: _________________________________ Date: ________________</p>
+<p><b>If acting on behalf of a company or corporation, please complete the following information for the person named below, who represents that he/she is authorized to bind the following company or corporation:</b></p>
+<p>Company Name: ___________________________ Signature of Authorized Representative: ________________________________</p>
+<p>Name: ________________________________ Title: ______________________________ Date: _________________</p>
+<p style="page-break-after: always" ></p>
+
+<p><b>Selection Material:</b></p>
+
+            <div style="page-break-inside: avoid">
+            <p><b>{{element.unit.book.isbn}}_CH{{element.unit.chapter_number}}_{{element.shortform}}{{element.element_number}}</b></p>
+            {% if element.text_data == None %}              
+            <p><img src="../media/documents/{{element.unit.book.isbn}}/resized/{{element.unit.book.isbn}}_CH{{element.unit.chapter_number}}_{{element.shortform}}{{element.element_number}}.png"/></p>
+              {% else %}
+              <p><b> Text:</b> {{element.text_data}}</p>
+              {% endif %}
+            
+            </div>
+
+</body>
+{% endblock %}
+</html>

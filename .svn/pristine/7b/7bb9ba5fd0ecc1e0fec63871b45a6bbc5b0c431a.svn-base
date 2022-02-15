@@ -8,7 +8,7 @@
     <a href="{% url 'new_contact' %}" class="btn btn-primary btn-sm">NEW CONTACT</a>
     <a href="{% url 'import_contact' %}" class="btn btn-primary btn-sm">IMPORT CONTACTS</a>
     <a href="{% url 'contact_inactive' %}" class="btn btn-primary btn-sm">INACTIVE CONTACTS</a> 
-    <a href="{% url 'refresh_contact' %}" class="btn btn-primary btn-sm">REFRESH CONTACTS</a>
+    <a href="{% url 'contact_load' %}" class="btn btn-primary btn-sm">LOAD CONTACTS</a>
     
     <!-- <a href="{% url 'import_book' %}" class="btn btn-primary btn-sm">IMPORT BOOK</a>
     <a href="{% url 'export_books' %}" class="btn btn-primary btn-sm">EXPORT BOOK DETAILS</a> -->
