@@ -1411,7 +1411,9 @@ def followup_email_agreement(request, pk, ems):
                 email_rh = e.rh_email
                 source = e.source
                 imag_calc_name=e.imag_calc_name
-                rs_name = e.jbl_rh_name
+                 #rs_name=e.jbl_rh_name
+                rs_name=e.rs_name
+                
                 rh_address=e.rh_address  
                 
     address=[]

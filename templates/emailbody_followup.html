@@ -48,21 +48,7 @@
 <p>{% with element.all|first as e %}
   <b>{{ e.title }}</b>
 {% endwith %}</p>
-<p>We would like to obtain permission to use the attached image(s) of for this edition:
-{% spaceless %}
-<ol>    
-{% for ems in ems_list %}
-    {% for e in element%}
-        {% if ems == e.pk %}
-                <li>
-                    <p>{{e.caption}}</p>
-                </li>
-        {% endif %}
-    {% endfor %}    
-{% endfor %}
-</ol>
-{% endspaceless %}
-I have attached a copy of the permission request for you, which contains more information of our publication and the rights that we are requesting.</p>
+<I>We would like to obtain permission to use the attached image(s) of for this edition and I have also attached a copy of the permission request for you, which contains more information of our publication and the rights that we are requesting.</p>
 {% spaceless %}
 <ol>    
 {% for ems in ems_list %}
