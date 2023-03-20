@@ -1,6 +1,6 @@
 asgiref==3.4.1
 cairocffi==1.1.0
-CairoSVG==2.5.2
+CairoSVG==2.7.0
 cffi==1.14.0
 cssselect2==0.3.0
 defusedxml==0.6.0
