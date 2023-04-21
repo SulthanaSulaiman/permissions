@@ -34,7 +34,7 @@ PyYAML==5.4.1
 selenium==3.141.0
 six==1.14.0
 sorl-thumbnail==12.6.3
-sqlparse==0.3.1
+sqlparse==0.4.4
 tablib==1.1.0
 tinycss2==1.0.2
 typing-extensions==3.10.0.2
